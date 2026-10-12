@@ -2,6 +2,262 @@ import XCTest
 @testable import Ping_Island
 
 final class SessionStoreCodexInterventionTests: XCTestCase {
+    func testFreshCodexSnapshotClearsTerminalPromptFlagAfterWaitingEnds() async throws {
+        let store = SessionStore.shared
+        for phase in [SessionPhase.idle, .processing] {
+            let sessionId = "codex-terminal-snapshot-\(UUID().uuidString)"
+            let prompt = try await seedTerminalRoutedPrompt(sessionId: sessionId)
+
+            await store.syncCodexThreadSnapshot(makeTerminalPromptSnapshot(
+                for: prompt,
+                phase: phase,
+                updatedAt: prompt.lastActivity.addingTimeInterval(1)
+            ))
+
+            let stored = await store.session(for: sessionId)
+            let session = try XCTUnwrap(stored)
+            XCTAssertEqual(session.phase, phase)
+            assertTerminalPromptCleared(session)
+            await store.process(.sessionArchived(sessionId: sessionId))
+        }
+    }
+
+    func testFreshCodexUpsertClearsTerminalPromptFlagAfterWaitingEnds() async throws {
+        let store = SessionStore.shared
+        for phase in [SessionPhase.idle, .processing] {
+            let sessionId = "codex-terminal-upsert-\(UUID().uuidString)"
+            let prompt = try await seedTerminalRoutedPrompt(sessionId: sessionId)
+
+            await store.upsertCodexSession(
+                sessionId: sessionId,
+                name: "Codex",
+                preview: phase == .idle ? "Done" : "Continuing",
+                cwd: prompt.cwd,
+                phase: phase,
+                intervention: nil,
+                clientInfo: prompt.clientInfo,
+                activityAt: prompt.lastActivity.addingTimeInterval(1)
+            )
+
+            let stored = await store.session(for: sessionId)
+            let session = try XCTUnwrap(stored)
+            XCTAssertEqual(session.phase, phase)
+            assertTerminalPromptCleared(session)
+            await store.process(.sessionArchived(sessionId: sessionId))
+        }
+    }
+
+    func testResolvingCodexTerminalPromptClearsFlagAndRestoresList() async throws {
+        let store = SessionStore.shared
+        for phase in [SessionPhase.idle, .processing, .waitingForInput] {
+            let sessionId = "codex-terminal-resolved-\(UUID().uuidString)"
+            _ = try await seedTerminalRoutedPrompt(sessionId: sessionId)
+
+            await store.resolveCodexIntervention(sessionId: sessionId, nextPhase: phase)
+
+            let stored = await store.session(for: sessionId)
+            let session = try XCTUnwrap(stored)
+            XCTAssertEqual(session.phase, phase)
+            assertTerminalPromptCleared(session)
+            await store.process(.sessionArchived(sessionId: sessionId))
+        }
+    }
+
+    func testStaleCodexSnapshotPreservesNewerTerminalPrompt() async throws {
+        let store = SessionStore.shared
+        for phase in [SessionPhase.idle, .processing] {
+            let sessionId = "codex-terminal-stale-snapshot-\(UUID().uuidString)"
+            let prompt = try await seedTerminalRoutedPrompt(sessionId: sessionId)
+
+            await store.syncCodexThreadSnapshot(makeTerminalPromptSnapshot(
+                for: prompt,
+                phase: phase,
+                updatedAt: prompt.lastActivity.addingTimeInterval(-1)
+            ))
+
+            let stored = await store.session(for: sessionId)
+            let session = try XCTUnwrap(stored)
+            XCTAssertEqual(session.phase, .waitingForInput)
+            XCTAssertTrue(session.suppressInAppPromptControls)
+            XCTAssertTrue(session.needsPromptNotification)
+            XCTAssertEqual(session.lastActivity, prompt.lastActivity)
+            await store.process(.sessionArchived(sessionId: sessionId))
+        }
+    }
+
+    func testInterruptedSnapshotOnlyClearsTerminalPromptWhenFresh() async throws {
+        let store = SessionStore.shared
+        for isFresh in [false, true] {
+            let sessionId = "codex-terminal-interrupted-\(UUID().uuidString)"
+            let prompt = try await seedTerminalRoutedPrompt(sessionId: sessionId)
+            await store.syncCodexThreadSnapshot(makeTerminalPromptSnapshot(
+                for: prompt,
+                phase: .idle,
+                updatedAt: prompt.lastActivity.addingTimeInterval(isFresh ? 1 : -1),
+                isTurnInterrupted: true
+            ))
+            let stored = await store.session(for: sessionId)
+            let session = try XCTUnwrap(stored)
+            XCTAssertEqual(session.phase, isFresh ? .idle : .waitingForInput)
+            XCTAssertEqual(session.isCodexTurnInterrupted, isFresh)
+            XCTAssertEqual(session.suppressInAppPromptControls, !isFresh)
+            XCTAssertEqual(session.needsPromptNotification, !isFresh)
+            await store.process(.sessionArchived(sessionId: sessionId))
+        }
+    }
+
+    func testStaleCodexUpsertPreservesNewerTerminalPrompt() async throws {
+        let store = SessionStore.shared
+        let sessionId = "codex-terminal-stale-upsert-\(UUID().uuidString)"
+        let prompt = try await seedTerminalRoutedPrompt(sessionId: sessionId)
+
+        await store.upsertCodexSession(
+            sessionId: sessionId,
+            name: "Codex",
+            preview: "Old result",
+            cwd: prompt.cwd,
+            phase: .idle,
+            intervention: nil,
+            clientInfo: prompt.clientInfo,
+            activityAt: prompt.lastActivity.addingTimeInterval(-1)
+        )
+
+        let stored = await store.session(for: sessionId)
+        let session = try XCTUnwrap(stored)
+        XCTAssertEqual(session.phase, .waitingForInput)
+        XCTAssertTrue(session.suppressInAppPromptControls)
+        XCTAssertTrue(session.needsPromptNotification)
+        await store.process(.sessionArchived(sessionId: sessionId))
+    }
+
+    func testReadSnapshotPreservesQuestionArrivingAfterTerminalPrompt() async throws {
+        let store = SessionStore.shared
+        let sessionId = "codex-terminal-read-question-\(UUID().uuidString)"
+        let prompt = try await seedTerminalRoutedPrompt(sessionId: sessionId)
+        let readState = CodexThreadReadState(intervention: prompt.intervention)
+        let snapshot = makeTerminalPromptSnapshot(
+            for: prompt,
+            phase: .idle,
+            updatedAt: prompt.lastActivity.addingTimeInterval(1)
+        )
+        let question = SessionIntervention(
+            id: "newer-question",
+            kind: .question,
+            title: "Choose",
+            message: "Continue?",
+            options: [],
+            questions: [],
+            supportsSessionScope: false,
+            metadata: [:]
+        )
+        await store.upsertCodexSession(
+            sessionId: sessionId,
+            name: "Codex",
+            preview: question.message,
+            cwd: prompt.cwd,
+            phase: .waitingForInput,
+            intervention: question,
+            clientInfo: prompt.clientInfo,
+            activityAt: prompt.lastActivity.addingTimeInterval(2)
+        )
+
+        await store.syncCodexThreadSnapshot(snapshot, readState: readState)
+
+        let stored = await store.session(for: sessionId)
+        let session = try XCTUnwrap(stored)
+        XCTAssertEqual(session.phase, .waitingForInput)
+        XCTAssertEqual(session.intervention?.id, question.id)
+        XCTAssertTrue(session.suppressInAppPromptControls)
+        XCTAssertTrue(session.needsPromptNotification)
+        await store.process(.sessionArchived(sessionId: sessionId))
+    }
+
+    private func seedTerminalRoutedPrompt(sessionId: String) async throws -> SessionState {
+        let store = SessionStore.shared
+        await store.process(.hookReceived(HookEvent(
+            sessionId: sessionId,
+            cwd: "/tmp/\(sessionId)",
+            event: "PreToolUse",
+            status: "waiting_for_input",
+            provider: .codex,
+            clientInfo: SessionClientInfo.codexApp(threadId: sessionId),
+            pid: nil,
+            tty: nil,
+            tool: "AskUserQuestion",
+            toolInput: ["questions": AnyCodable([["question": "Continue?"]])],
+            toolUseId: "terminal-question",
+            notificationType: nil,
+            message: "Continue?",
+            suppressInAppPrompt: true
+        )))
+        let stored = await store.session(for: sessionId)
+        let prompt = try XCTUnwrap(stored)
+        XCTAssertEqual(prompt.phase, .waitingForInput)
+        XCTAssertTrue(prompt.suppressInAppPromptControls)
+        XCTAssertTrue(prompt.needsPromptNotification)
+        XCTAssertNil(prompt.intervention)
+        return prompt
+    }
+
+    private func makeTerminalPromptSnapshot(
+        for prompt: SessionState,
+        phase: SessionPhase,
+        updatedAt: Date,
+        isTurnInterrupted: Bool = false
+    ) -> CodexThreadSnapshot {
+        let isCompleted = phase == .idle
+        let text = isCompleted ? "Done" : "Continuing"
+        return CodexThreadSnapshot(
+            threadId: prompt.sessionId,
+            name: "Codex",
+            preview: text,
+            cwd: prompt.cwd,
+            clientInfo: prompt.clientInfo,
+            intervention: nil,
+            createdAt: prompt.createdAt,
+            updatedAt: updatedAt,
+            phase: phase,
+            historyItems: [ChatHistoryItem(
+                id: "snapshot-message",
+                type: isCompleted ? .assistant(text) : .user(text),
+                timestamp: updatedAt
+            )],
+            conversationInfo: ConversationInfo(
+                summary: "Codex",
+                lastMessage: text,
+                lastMessageRole: isCompleted ? "assistant" : "user",
+                lastToolName: nil,
+                firstUserMessage: "Continue?",
+                lastUserMessageDate: prompt.lastActivity
+            ),
+            latestTurnId: "turn-1",
+            latestResponseText: isCompleted ? text : nil,
+            latestResponsePhase: isCompleted ? "final" : nil,
+            latestUserText: "Continue?",
+            isTurnInterrupted: isTurnInterrupted
+        )
+    }
+
+    private func assertTerminalPromptCleared(
+        _ session: SessionState,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertFalse(session.suppressInAppPromptControls, file: file, line: line)
+        XCTAssertFalse(session.needsPromptNotification, file: file, line: line)
+        XCTAssertEqual(
+            IslandExpandedRouteResolver.resolve(
+                surface: .docked,
+                trigger: .click,
+                contentType: .instances,
+                sessions: [session]
+            ),
+            .sessionList,
+            file: file,
+            line: line
+        )
+    }
+
     func testHistoricalCodexThreadListCreatedAtIsPreserved() async throws {
         let sessionId = "codex-historical-thread-\(UUID().uuidString)"
         let store = SessionStore.shared

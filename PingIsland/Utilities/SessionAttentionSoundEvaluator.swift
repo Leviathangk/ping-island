@@ -11,8 +11,6 @@ enum SessionAttentionSoundEvaluator {
     /// `attentionRequired` sound on the phase-edge channel.
     nonisolated static func shouldContributeToAttentionSoundEdge(_ session: SessionState) -> Bool {
         guard session.connectionState == .connected, !session.autoApprovePermissions else { return false }
-        return session.needsApprovalResponse
-            || session.needsQuestionResponse
-            || session.suppressInAppPromptControls
+        return session.needsPromptNotification
     }
 }

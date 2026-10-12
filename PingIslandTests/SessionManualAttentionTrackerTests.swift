@@ -101,6 +101,24 @@ final class SessionManualAttentionTrackerTests: XCTestCase {
         XCTAssertNil(tracker.consumeNewAttentionSession(from: [session]))
     }
 
+    func testTerminalPromptFlagDoesNotTriggerAttentionOutsideWaitingPhase() {
+        for phase in [SessionPhase.idle, .processing, .ended] {
+            var tracker = SessionManualAttentionTracker()
+            var session = SessionState(
+                sessionId: "stale-terminal-prompt-\(phase.description)",
+                cwd: "/tmp/project",
+                suppressInAppPromptControls: true,
+                phase: phase
+            )
+
+            XCTAssertNil(tracker.consumeNewAttentionSession(from: [session]))
+            session.phase = .waitingForInput
+            XCTAssertEqual(tracker.consumeNewAttentionSession(from: [session]), session)
+            session.phase = phase
+            XCTAssertNil(tracker.consumeNewAttentionSession(from: [session]))
+        }
+    }
+
     func testApprovalToolUseRefreshInSameSessionTriggersAttentionAgain() {
         var tracker = SessionManualAttentionTracker()
         let firstApproval = makeApprovalSession(toolUseId: "tool-1")

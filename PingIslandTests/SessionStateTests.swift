@@ -502,6 +502,32 @@ final class SessionStateTests: XCTestCase {
         XCTAssertTrue(ordinaryCompleted.shouldAutoArchiveFromPrimaryUI)
     }
 
+    func testTerminalPromptFlagDoesNotRequireAttentionAfterWaitingEnds() {
+        for phase in [SessionPhase.idle, .processing, .ended] {
+            let session = SessionState(
+                sessionId: "stale-terminal-prompt-\(phase.description)",
+                cwd: "/tmp/terminal-routed-project",
+                suppressInAppPromptControls: true,
+                phase: phase,
+                lastActivity: Date().addingTimeInterval(-(31 * 60))
+            )
+
+            XCTAssertFalse(session.needsPromptNotification, "phase=\(phase.description)")
+            XCTAssertNil(session.attentionRequestedAt)
+            XCTAssertTrue(session.shouldAutoArchiveFromPrimaryUI)
+            XCTAssertEqual(
+                IslandExpandedRouteResolver.resolve(
+                    surface: .docked,
+                    trigger: .click,
+                    contentType: .instances,
+                    sessions: [session]
+                ),
+                .sessionList,
+                "An expired terminal prompt must not keep the bell or replace the session list"
+            )
+        }
+    }
+
     func testClaudeCodeWaitingForApprovalWithoutSessionScopeDoesNotExposeAutoApproveAction() {
         let session = SessionState(
             sessionId: "claude-no-session-scope",

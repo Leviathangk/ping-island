@@ -3910,7 +3910,8 @@ actor SessionStore {
             currentPhase: session.phase,
             incomingPhase: phase,
             currentLastActivity: existingLastActivity,
-            incomingActivityAt: incomingActivityAt
+            incomingActivityAt: incomingActivityAt,
+            hasTerminalRoutedPrompt: session.suppressInAppPromptControls && session.phase == .waitingForInput
         ) {
             // Keep the fresher active state until Codex catches up with a newer snapshot.
         } else if session.phase.canTransition(to: phase) || session.phase == phase {
@@ -3959,6 +3960,9 @@ actor SessionStore {
         recordCompactionTransition(from: previousPhase, in: &session)
         if session.phase == .processing, incomingActivityAt > (existingLastActivity ?? .distantPast) {
             session.isCodexTurnInterrupted = false
+        }
+        if session.phase != .waitingForInput, !session.needsManualAttention {
+            session.suppressInAppPromptControls = false
         }
 
         let placeholderCandidate = isLikelyEmptyCodexPlaceholder(session)
@@ -4085,10 +4089,13 @@ actor SessionStore {
             currentPhase: session.phase,
             incomingPhase: snapshotPhase,
             currentLastActivity: existingLastActivity,
-            incomingActivityAt: snapshot.updatedAt
+            incomingActivityAt: snapshot.updatedAt,
+            hasTerminalRoutedPrompt: session.suppressInAppPromptControls && session.phase == .waitingForInput
         )
-        let shouldPreserveActiveTurnState = !snapshot.isTurnInterrupted
-            && (shouldPreserveActivePhase || shouldPreserveStaleActivePhase)
+        let shouldPreserveNewerTerminalPrompt = session.suppressInAppPromptControls
+            && session.phase == .waitingForInput && shouldPreserveStaleActivePhase
+        let shouldPreserveActiveTurnState = shouldPreserveNewerTerminalPrompt
+            || (!snapshot.isTurnInterrupted && (shouldPreserveActivePhase || shouldPreserveStaleActivePhase))
         if !shouldPreserveActiveTurnState {
             // An ordinary idle refresh or a late running snapshot is not
             // evidence that the explicitly aborted turn resumed.
@@ -4123,11 +4130,13 @@ actor SessionStore {
             nextPhase: snapshotPhase,
             clientKind: session.clientInfo.kind
         )
-        if !shouldPreserveExternalIntervention && !interventionChangedDuringRead {
+        if !shouldPreserveExternalIntervention && !interventionChangedDuringRead && !shouldPreserveNewerTerminalPrompt {
             session.intervention = snapshot.intervention
         }
         if interventionChangedDuringRead {
             // A newer request or resolution owns both the card and its phase.
+        } else if shouldPreserveNewerTerminalPrompt {
+            // A previous turn's abort cannot resolve a newer terminal question.
         } else if shouldPreserveExternalIntervention {
             if let hookPermissionPhase = restoredCodexHookPermissionPhase(from: session.intervention) {
                 session.phase = hookPermissionPhase
@@ -4174,6 +4183,9 @@ actor SessionStore {
         }
         recordCompactionTransition(from: previousPhase, in: &session)
 
+        if session.phase != .waitingForInput, !session.needsManualAttention {
+            session.suppressInAppPromptControls = false
+        }
         let placeholderCandidate = isLikelyEmptyCodexPlaceholder(session)
         Self.logger.debug(
             "Codex snapshot sync session=\(resolvedSessionId, privacy: .public) sourceThread=\(snapshot.threadId, privacy: .public) ingress=\(ingress.rawValue, privacy: .public) historyItems=\(snapshot.historyItems.count, privacy: .public) namePresent=\(snapshot.name?.isEmpty == false, privacy: .public) previewPresent=\(snapshot.preview?.isEmpty == false, privacy: .public) filePathPresent=\(session.clientInfo.sessionFilePath?.isEmpty == false, privacy: .public) placeholderCandidate=\(placeholderCandidate, privacy: .public)"
@@ -4282,10 +4294,10 @@ actor SessionStore {
         currentPhase: SessionPhase,
         incomingPhase: SessionPhase,
         currentLastActivity: Date?,
-        incomingActivityAt: Date
+        incomingActivityAt: Date,
+        hasTerminalRoutedPrompt: Bool = false
     ) -> Bool {
-        guard currentPhase.isActive else { return false }
-        guard incomingPhase == .idle else { return false }
+        guard (currentPhase.isActive && incomingPhase == .idle) || hasTerminalRoutedPrompt else { return false }
         guard let currentLastActivity else { return false }
         return incomingActivityAt < currentLastActivity
     }
@@ -4300,6 +4312,7 @@ actor SessionStore {
         // Delayed replies may not clear a newer approval request.
         if let requestId, session.intervention?.id != requestId { return }
         session.intervention = nil
+        session.suppressInAppPromptControls = false
         session.phase = nextPhase
         session.lastActivity = Date()
         sessions[resolvedSessionId] = session

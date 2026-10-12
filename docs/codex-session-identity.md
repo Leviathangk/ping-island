@@ -58,6 +58,21 @@ proof of an internal task. `ambient_suggestion_task` denotes a task accepted by
 the user and must remain visible. Blocking questions and approvals retain their
 existing protection from filtering.
 
+## Terminal-only prompts and list access
+
+`suppressInAppPromptControls` identifies a prompt whose answer stays in the client.
+Without an approval or question intervention, it contributes to attention only
+while the session is waiting for input. Fresh Codex progress/completion updates
+and explicit request resolution clear that flag; older snapshots preserve newer
+unanswered prompts. This keeps a resolved, idle thread from holding a green bell
+and an empty attention card indefinitely.
+
+Automatic notifications and hover still prioritize unanswered prompts. Clicking
+or using the session-list shortcut opens the full list, where existing approval
+and question controls remain available. Switching an already-open completion
+notification to manual browsing also consumes the notification and cancels its
+dismissal timer.
+
 ## Verification
 
 - `swift test --package-path Prototype` covers statistics flags, multiple inherited
@@ -69,3 +84,5 @@ existing protection from filtering.
   summaries, and complete snapshots.
 - Auxiliary filter, rollout parser, placeholder, and session-state tests cover
   helper sources and prompts alongside ordinary JSON and user-created tasks.
+- Session-state, Codex-intervention, attention tracker/sound, and expanded-route
+  tests cover stale prompt flags, fresh versus older updates, and manual list access.

@@ -67,9 +67,8 @@ enum IslandExpandedRouteResolver {
             }
             return .hoverDashboard
         case (_, .click):
-            if let session = highestPriorityAttentionSession(from: sessions) {
-                return .attentionNotification(session)
-            }
+            // Explicit list access stays available while a prompt is pending.
+            // The list retains its approval/question controls and attention order.
             return .sessionList
         case (_, .pinnedList):
             return .sessionList

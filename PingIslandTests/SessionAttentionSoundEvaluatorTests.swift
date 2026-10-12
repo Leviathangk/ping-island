@@ -56,6 +56,22 @@ final class SessionAttentionSoundEvaluatorTests: XCTestCase {
         )
     }
 
+    func testTerminalPromptFlagDoesNotContributeAfterWaitingEnds() {
+        for phase in [SessionPhase.idle, .processing, .ended] {
+            var session = makeSession(
+                autoApprovePermissions: false,
+                phase: phase,
+                intervention: nil
+            )
+            session.suppressInAppPromptControls = true
+
+            XCTAssertFalse(
+                SessionAttentionSoundEvaluator.shouldContributeToAttentionSoundEdge(session),
+                "An expired terminal prompt must not emit attention sound in \(phase.description)"
+            )
+        }
+    }
+
     func testAutoApproveSuppressesContributionEvenWithApprovalIntervention() {
         // The bug: a PermissionRequest hook briefly inserts an approval
         // intervention before SessionMonitor auto-approves it. Without the

@@ -424,6 +424,13 @@ struct NotchView: View {
             .onChange(of: viewModel.status) { oldStatus, newStatus in
                 handleStatusChange(from: oldStatus, to: newStatus)
             }
+            .onChange(of: viewModel.openReason) { _, reason in
+                guard viewModel.status == .opened,
+                      reason == .click || reason == .hover else { return }
+                // Switching from a notification to the list need not change status.
+                completionReadyTimestamps.removeAll()
+                dismissActiveCompletionNotification(closePanel: false, advanceQueue: false)
+            }
     }
 
     private var settingsAwareBody: some View {

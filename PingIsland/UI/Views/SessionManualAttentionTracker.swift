@@ -74,7 +74,9 @@ struct SessionManualAttentionTracker {
         )
         let attentionQuestionIds = newQuestionIds.union(refreshedQuestionIds)
 
-        let terminalRoutedPromptSessions = instances.filter(\.suppressInAppPromptControls)
+        let terminalRoutedPromptSessions = instances.filter {
+            $0.suppressInAppPromptControls && $0.needsPromptNotification
+        }
         let currentTerminalRoutedPromptIds = Set(terminalRoutedPromptSessions.map(\.stableId))
         let currentTerminalRoutedPromptKeys = Dictionary(
             uniqueKeysWithValues: terminalRoutedPromptSessions.map { session in

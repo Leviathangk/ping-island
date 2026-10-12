@@ -165,11 +165,11 @@ final class SessionSoundEdgeTrackerTests: XCTestCase {
 
     func testAttentionEdgeCarriesOnlyTheNewlyWaitingSession() {
         var tracker = SessionSoundEdgeTracker()
-        tracker.prime(with: [session(id: "a", pid: 1, suppressInAppPromptControls: true)])
+        tracker.prime(with: [session(id: "a", pid: 1, phase: .waitingForInput, suppressInAppPromptControls: true)])
 
         let edge = tracker.edge(for: [
-            session(id: "a", pid: 1, suppressInAppPromptControls: true),
-            session(id: "b", pid: 2, suppressInAppPromptControls: true)
+            session(id: "a", pid: 1, phase: .waitingForInput, suppressInAppPromptControls: true),
+            session(id: "b", pid: 2, phase: .waitingForInput, suppressInAppPromptControls: true)
         ])
 
         XCTAssertEqual(edge?.event, .attentionRequired)
@@ -295,7 +295,7 @@ final class SessionSoundEdgeTrackerTests: XCTestCase {
 
         let edge = tracker.edge(for: [
             session(id: "a", pid: 1, completedErrorToolIDs: ["tool-1"]),
-            session(id: "b", pid: 2, suppressInAppPromptControls: true),
+            session(id: "b", pid: 2, phase: .waitingForInput, suppressInAppPromptControls: true),
             session(id: "c", pid: 3, phase: .processing)
         ])
 

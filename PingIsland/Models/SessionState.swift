@@ -241,7 +241,8 @@ struct SessionState: Equatable, Identifiable, Sendable {
     /// even when the prompt response itself must stay in the terminal/client.
     nonisolated var needsPromptNotification: Bool {
         connectionState == .connected && (
-            needsApprovalResponse || needsQuestionResponse || suppressInAppPromptControls
+            needsApprovalResponse || needsQuestionResponse
+                || (suppressInAppPromptControls && phase == .waitingForInput)
         )
     }
 

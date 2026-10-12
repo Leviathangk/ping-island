@@ -32,7 +32,7 @@ final class IslandExpandedRouteResolverTests: XCTestCase {
         XCTAssertEqual(route, .sessionList)
     }
 
-    func testClickWithManualAttentionResolvesToAttentionNotification() {
+    func testClickWithManualAttentionKeepsSessionListAccessible() {
         let attention = makeSession(
             id: "approval",
             phase: .waitingForApproval(
@@ -52,7 +52,32 @@ final class IslandExpandedRouteResolverTests: XCTestCase {
             sessions: [makeSession(id: "active", phase: .processing), attention]
         )
 
-        XCTAssertEqual(route, .attentionNotification(attention))
+        XCTAssertEqual(route, .sessionList)
+    }
+
+    func testClickWithTerminalOnlyPromptKeepsSessionListAccessibleOnBothSurfaces() {
+        var prompt = makeSession(id: "terminal-question", phase: .waitingForInput)
+        prompt.suppressInAppPromptControls = true
+        for surface in [IslandExpandedSurface.docked, .floating] {
+            XCTAssertEqual(
+                IslandExpandedRouteResolver.resolve(
+                    surface: surface,
+                    trigger: .click,
+                    contentType: .instances,
+                    sessions: [prompt]
+                ),
+                .sessionList
+            )
+            XCTAssertEqual(
+                IslandExpandedRouteResolver.resolve(
+                    surface: surface,
+                    trigger: .notification,
+                    contentType: .instances,
+                    sessions: [prompt]
+                ),
+                .attentionNotification(prompt)
+            )
+        }
     }
 
     func testHoverWithoutManualAttentionResolvesToHoverDashboard() {
