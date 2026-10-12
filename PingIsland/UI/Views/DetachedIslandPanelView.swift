@@ -7,7 +7,7 @@ struct DetachedIslandPetMetrics: Equatable {
     let petVisualFrame: CGFloat
     let petHitFrame: CGFloat
     let mascotDisplaySize: CGFloat
-    let badgeOffset: CGSize
+    let activeCountGap: CGFloat
     let floatingUsageBoltGap: CGFloat
     let floatingUsageBoltFontSize: CGFloat
 
@@ -21,7 +21,7 @@ struct DetachedIslandPetMetrics: Equatable {
         self.petVisualFrame = 74 * sanitizedScale
         self.petHitFrame = 92 * sanitizedScale
         self.mascotDisplaySize = 46 * sanitizedScale
-        self.badgeOffset = CGSize(width: 4, height: 2)
+        self.activeCountGap = 4 * sanitizedScale
         self.floatingUsageBoltGap = 9
         self.floatingUsageBoltFontSize = 8 * sanitizedScale
     }
@@ -57,6 +57,16 @@ enum DetachedIslandPanelMetrics {
 
     static func petMetrics(scale: Double) -> DetachedIslandPetMetrics {
         DetachedIslandPetMetrics(scale: CGFloat(scale))
+    }
+}
+
+enum DetachedFloatingPetAppearance {
+    static func isDark(_ appearance: NSAppearance) -> Bool {
+        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+    }
+
+    static func activeCountColor(isDark: Bool) -> Color {
+        isDark ? .white : .black
     }
 }
 
@@ -753,7 +763,7 @@ struct DetachedIslandPanelView: View {
             height: layout.containerSize.height,
             alignment: .topLeading
         )
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(settings.appearanceMode.preferredColorScheme)
         .onAppear {
             if !SessionMonitor.isRunningUnderXCTest {
                 sessionMonitor.startMonitoring()
@@ -877,11 +887,11 @@ private struct DetachedFloatingPetSettingsHintView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(appLocalized: "最后一步：右键宠物形象")
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.islandForeground)
 
                 Text(appLocalized: "需要重新打开设置面板时，直接右键宠物形象就可以。")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.white.opacity(0.72))
+                    .foregroundColor(Color.islandForeground.opacity(0.72))
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, 12)
@@ -909,23 +919,24 @@ private struct DetachedFloatingPetInteractionView: View {
     let onDragStarted: () -> Void
     let onDragChanged: (CGSize) -> Void
     let onDragEnded: () -> Void
+    @ObservedObject private var settings = AppSettings.shared
+    // The count sits on the desktop; system mode must observe the app's
+    // appearance, not a bubble or Settings window's explicit override.
+    @State private var isDarkSystemAppearance = DetachedFloatingPetAppearance.isDark(
+        NSApplication.shared.effectiveAppearance
+    )
 
     var body: some View {
-        DetachedFloatingMascotView(
+        DetachedFloatingPetArtwork(
             kind: mascotKind,
             status: mascotStatus,
             petMetrics: petMetrics,
-            isDragging: isDragging
+            isDragging: isDragging,
+            activeCount: activeCount,
+            countColor: DetachedFloatingPetAppearance.activeCountColor(
+                isDark: settings.appearanceMode.isDark(systemIsDark: isDarkSystemAppearance)
+            )
         )
-        .overlay(alignment: .bottomTrailing) {
-            if activeCount > 0 {
-                activeCountBadge
-                    .offset(
-                        x: petMetrics.badgeOffset.width,
-                        y: petMetrics.badgeOffset.height
-                    )
-            }
-        }
         .overlay(alignment: .top) {
             if !usageWindows.isEmpty {
                 DetachedFloatingUsageBoltView(
@@ -965,18 +976,11 @@ private struct DetachedFloatingPetInteractionView: View {
                 height: petMetrics.petHitFrame
             )
         }
+        .onReceive(NSApplication.shared.publisher(for: \.effectiveAppearance)) { appearance in
+            isDarkSystemAppearance = DetachedFloatingPetAppearance.isDark(appearance)
+        }
     }
 
-    @ViewBuilder
-    private var activeCountBadge: some View {
-        PixelNumberView(
-            value: activeCount,
-            color: .white.opacity(0.96),
-            fontSize: petMetrics.activeCountFontSize(for: activeCount),
-            weight: .semibold,
-            tracking: activeCount >= 10 ? -0.15 : -0.05
-        )
-    }
 }
 
 private struct DetachedFloatingUsageBoltView: View {
@@ -1143,11 +1147,13 @@ private final class DetachedPetInteractionView: NSView {
     }
 }
 
-private struct DetachedFloatingMascotView: View {
+struct DetachedFloatingPetArtwork: View {
     let kind: MascotKind
     let status: MascotStatus
     let petMetrics: DetachedIslandPetMetrics
     let isDragging: Bool
+    let activeCount: Int
+    let countColor: Color
 
     private var renderSize: CGFloat {
         petMetrics.mascotDisplaySize * DetachedIslandPanelMetrics.mascotRenderScale
@@ -1172,11 +1178,28 @@ private struct DetachedFloatingMascotView: View {
         )
         .compositingGroup()
         .drawingGroup(opaque: false, colorMode: .linear)
+        .overlay(alignment: .bottomLeading) {
+            if activeCount > 0 {
+                PixelNumberView(
+                    value: activeCount,
+                    color: countColor,
+                    fontSize: petMetrics.activeCountFontSize(for: activeCount),
+                    weight: .semibold,
+                    tracking: activeCount >= 10 ? -0.15 : -0.05
+                )
+                // Anchor the text's leading edge outside the entire sprite,
+                // including keyboards, without moving the pet as the count grows.
+                .offset(
+                    x: petMetrics.mascotDisplaySize + petMetrics.activeCountGap,
+                    y: 2 * petMetrics.scale
+                )
+            }
+        }
         .allowsHitTesting(false)
     }
 }
 
-private struct DetachedIslandBubbleChrome<Content: View>: View {
+struct DetachedIslandBubbleChrome<Content: View>: View {
     let placement: DetachedIslandBubblePlacement
     @ViewBuilder let content: Content
     @Environment(\.islandExperienceTheme) private var theme
@@ -1195,6 +1218,11 @@ private struct DetachedIslandBubbleChrome<Content: View>: View {
                 .padding(.vertical, DetachedIslandPanelMetrics.bubbleVerticalPadding)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
+            .overlay {
+                // The mask keeps a one-point border inside the existing window bounds.
+                shape.stroke(Color.islandForeground.opacity(0.28), lineWidth: 2)
+                    .allowsHitTesting(false)
+            }
             .compositingGroup()
             .mask(shape)
             .padding(DetachedIslandPanelMetrics.bubbleRenderInset)
