@@ -68,6 +68,9 @@ session views use adaptive neutrals, while saturated decision buttons keep their
 fixed white foregrounds and mascot artwork is unchanged. The floating task count
 resolves the selected mode against the system appearance (black/light, white/dark).
 The docked notch remains canonical black with a dark content environment.
+Expanded tool results use the same adaptive neutrals for code, raw output,
+filenames, line numbers, and metadata. Diff additions and deletions use darker
+green/red text in light appearance while retaining their existing dark palette.
 Detached panels keep an inset outline even against a matching desktop background;
 session cards use separate fills and stronger borders so both nesting levels remain visible.
 This includes the hover dashboard and attention cards, not just the pinned list.
