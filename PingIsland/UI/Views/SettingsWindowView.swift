@@ -830,7 +830,7 @@ private struct SoundSettingsContent: View {
                     } accessory: {
                         Image(systemName: "square.and.arrow.down")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.islandForeground.opacity(0.72))
+                            .foregroundColor(.white.opacity(0.72))
                     }
 
                     if soundPacks.availablePacks.isEmpty {
@@ -1008,11 +1008,11 @@ private struct AgentUsageAnalyticsContent: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(appLocalized: "统计")
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(Color.islandForeground.opacity(0.94))
+                    .foregroundColor(.white.opacity(0.94))
 
                 Text(appLocalized: "查看 Agent、Token、工具调用与活跃概览")
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.48))
+                    .foregroundColor(.white.opacity(0.48))
             }
 
             AgentUsageSummaryCards(snapshot: viewModel.snapshot)
@@ -1155,7 +1155,7 @@ private struct AgentUsageRangeControl: View {
             Button(action: refresh) {
                 Image(systemName: isRefreshing ? "arrow.triangle.2.circlepath" : "arrow.clockwise")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.72))
+                    .foregroundColor(.white.opacity(0.72))
                     .frame(width: 24, height: 24)
                     .contentShape(Rectangle())
             }
@@ -1285,12 +1285,12 @@ private struct AgentUsageSummaryCard: View {
             VStack(alignment: .leading, spacing: 7) {
                 Text(appLocalized: title)
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.58))
+                    .foregroundColor(.white.opacity(0.58))
                     .lineLimit(1)
 
                 Text(verbatim: value)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundColor(Color.islandForeground.opacity(0.94))
+                    .foregroundColor(.white.opacity(0.94))
                     .monospacedDigit()
                     .minimumScaleFactor(0.56)
                     .lineLimit(1)
@@ -1298,7 +1298,7 @@ private struct AgentUsageSummaryCard: View {
 
                 Text(appLocalized: subtitle)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.42))
+                    .foregroundColor(.white.opacity(0.42))
                     .lineLimit(2)
             }
             .layoutPriority(1)
@@ -1309,7 +1309,7 @@ private struct AgentUsageSummaryCard: View {
         .frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color.islandForeground.opacity(0.045))
+                .fill(Color.white.opacity(0.045))
                 .overlay(
                     SettingsGlassSurface(material: .hudWindow, blendingMode: .withinWindow)
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -1326,7 +1326,7 @@ private struct AgentUsageSummaryCard: View {
                     LinearGradient(
                         colors: [
                             tint.opacity(0.13),
-                            Color.islandForeground.opacity(0.035),
+                            Color.white.opacity(0.035),
                             Color.black.opacity(0.035)
                         ],
                         startPoint: .topLeading,
@@ -1411,13 +1411,13 @@ private struct AgentUsageRecentSessionsCard: View {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text(verbatim: AgentUsageFormat.compactTokenCount(tokenTotals.resolvedTotal))
                     .font(.system(size: 26, weight: .bold, design: .rounded))
-                    .foregroundColor(Color.islandForeground.opacity(0.94))
+                    .foregroundColor(.white.opacity(0.94))
                     .monospacedDigit()
                     .help(AgentUsageFormat.integer(tokenTotals.resolvedTotal))
 
                 Text(appLocalized: "Tokens 合计")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.42))
+                    .foregroundColor(.white.opacity(0.42))
             }
 
             if sessions.isEmpty {
@@ -1455,7 +1455,7 @@ private struct AgentUsageTopSessionCard: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(verbatim: AgentUsageFormat.sessionTitle(session))
                         .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(Color.islandForeground.opacity(0.92))
+                        .foregroundColor(.white.opacity(0.92))
                         .lineLimit(2)
                         .truncationMode(.tail)
                         .help(AgentUsageFormat.sessionTitle(session))
@@ -1470,7 +1470,7 @@ private struct AgentUsageTopSessionCard: View {
 
                 Text(verbatim: AgentUsageFormat.compactTokenCount(session.tokenTotals.resolvedTotal))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
-                    .foregroundColor(Color.islandForeground.opacity(0.95))
+                    .foregroundColor(.white.opacity(0.95))
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.62)
@@ -1479,7 +1479,7 @@ private struct AgentUsageTopSessionCard: View {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(appLocalized: "本周累计 Tokens")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color.islandForeground.opacity(0.42))
+                        .foregroundColor(.white.opacity(0.42))
 
                     Spacer(minLength: 8)
 
@@ -1523,7 +1523,7 @@ private struct AgentUsageSessionCardHeader: View {
 
             Text(appLocalized: title)
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.66))
+                .foregroundColor(.white.opacity(0.66))
                 .lineLimit(1)
 
             Spacer(minLength: 0)
@@ -1539,14 +1539,14 @@ private struct AgentUsageSessionSpendRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(verbatim: AgentUsageFormat.sessionTitle(session))
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.82))
+                    .foregroundColor(.white.opacity(0.82))
                     .lineLimit(1)
                     .truncationMode(.middle)
                     .help(AgentUsageFormat.sessionTitle(session))
 
                 Text(verbatim: session.agent)
                     .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.38))
+                    .foregroundColor(.white.opacity(0.38))
                     .lineLimit(1)
             }
 
@@ -1557,7 +1557,7 @@ private struct AgentUsageSessionSpendRow: View {
                 AgentUsageFormat.compactTokenCount(session.tokenTotals.resolvedTotal)
             ))
                 .font(.system(size: 11, weight: .bold, design: .rounded))
-                .foregroundColor(Color.islandForeground.opacity(0.70))
+                .foregroundColor(.white.opacity(0.70))
                 .monospacedDigit()
                 .lineLimit(1)
                 .help(AgentUsageFormat.integer(session.tokenTotals.resolvedTotal))
@@ -1571,7 +1571,7 @@ private struct AgentUsageSessionCardBackground: View {
 
     var body: some View {
         RoundedRectangle(cornerRadius: 16, style: .continuous)
-            .fill(Color.islandForeground.opacity(0.035))
+            .fill(Color.white.opacity(0.035))
             .overlay(
                 LinearGradient(
                     colors: [tint.opacity(0.11), Color.clear],
@@ -1616,7 +1616,7 @@ private struct AgentUsageSpendFooter: View {
                 AgentUsageFormat.compactTokenCount(summary.thirtyDays.tokenTotals.resolvedTotal)
             ))
                 .font(.system(size: 12, weight: .bold, design: .rounded))
-                .foregroundColor(Color.islandForeground.opacity(0.80))
+                .foregroundColor(.white.opacity(0.80))
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
@@ -1637,7 +1637,7 @@ private struct AgentUsageSpendFooter: View {
     private var pricingLabel: some View {
         Text(appLocalized: AgentUsageCostEstimator.blendedCodexClaudePricing.label)
             .font(.system(size: 11, weight: .medium))
-            .foregroundColor(Color.islandForeground.opacity(0.42))
+            .foregroundColor(.white.opacity(0.42))
             .lineLimit(1)
             .truncationMode(.middle)
     }
@@ -1657,12 +1657,12 @@ private struct AgentUsageSpendMetricTile: View {
         VStack(alignment: .leading, spacing: 7) {
             Text(appLocalized: title)
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.58))
+                .foregroundColor(.white.opacity(0.58))
                 .lineLimit(1)
 
             Text(verbatim: AgentUsageFormat.compactUSD(metric.estimatedUSD))
                 .font(.system(size: 24, weight: .bold, design: .rounded))
-                .foregroundColor(Color.islandForeground.opacity(0.94))
+                .foregroundColor(.white.opacity(0.94))
                 .monospacedDigit()
                 .minimumScaleFactor(0.56)
                 .lineLimit(1)
@@ -1673,7 +1673,7 @@ private struct AgentUsageSpendMetricTile: View {
                 AgentUsageFormat.compactTokenCount(metric.tokenTotals.resolvedTotal)
             ))
                 .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.42))
+                .foregroundColor(.white.opacity(0.42))
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
                 .help(AgentUsageFormat.integer(metric.tokenTotals.resolvedTotal))
@@ -1700,12 +1700,12 @@ private struct AgentUsageSpendBarChart: View {
                         .fill(
                             LinearGradient(
                                 colors: point.tokenTotal > 0 ? [
-                                    Color.islandForeground.opacity(0.92),
+                                    Color.white.opacity(0.92),
                                     TerminalColors.blue.opacity(0.58),
                                     TerminalColors.blue.opacity(0.78)
                                 ] : [
-                                    Color.islandForeground.opacity(0.18),
-                                    Color.islandForeground.opacity(0.10)
+                                    Color.white.opacity(0.18),
+                                    Color.white.opacity(0.10)
                                 ],
                                 startPoint: .top,
                                 endPoint: .bottom
@@ -1713,7 +1713,7 @@ private struct AgentUsageSpendBarChart: View {
                         )
                         .overlay(alignment: .top) {
                             RoundedRectangle(cornerRadius: min(4, barWidth * 0.45), style: .continuous)
-                                .fill(Color.islandForeground.opacity(point.tokenTotal > 0 ? 0.18 : 0.05))
+                                .fill(Color.white.opacity(point.tokenTotal > 0 ? 0.18 : 0.05))
                                 .frame(height: min(5, max(2, barHeight * 0.28)))
                         }
                         .frame(width: barWidth, height: barHeight)
@@ -1841,25 +1841,25 @@ private struct AgentUsageOverviewLine: View {
         HStack(alignment: .center, spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(Color.islandForeground.opacity(0.07))
+                    .fill(Color.white.opacity(0.07))
                     .overlay(
                         RoundedRectangle(cornerRadius: 9, style: .continuous)
-                            .strokeBorder(Color.islandForeground.opacity(0.10), lineWidth: 1)
+                            .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
                     )
                 Image(systemName: icon)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.72))
+                    .foregroundColor(.white.opacity(0.72))
             }
             .frame(width: 32, height: 32)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(appLocalized: title)
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.76))
+                    .foregroundColor(.white.opacity(0.76))
                     .lineLimit(1)
                 Text(appLocalized: subtitle)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.42))
+                    .foregroundColor(.white.opacity(0.42))
                     .lineLimit(1)
             }
             .layoutPriority(1)
@@ -1868,7 +1868,7 @@ private struct AgentUsageOverviewLine: View {
 
             Text(verbatim: value)
                 .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundColor(Color.islandForeground.opacity(0.92))
+                .foregroundColor(.white.opacity(0.92))
                 .monospacedDigit()
                 .minimumScaleFactor(0.56)
                 .lineLimit(1)
@@ -1889,10 +1889,10 @@ private struct AgentUsageMetricLine: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(appLocalized: title)
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.72))
+                    .foregroundColor(.white.opacity(0.72))
                 Text(appLocalized: subtitle)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.42))
+                    .foregroundColor(.white.opacity(0.42))
                     .lineLimit(2)
             }
             .layoutPriority(1)
@@ -1901,7 +1901,7 @@ private struct AgentUsageMetricLine: View {
 
             Text(verbatim: value)
                 .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundColor(Color.islandForeground.opacity(0.92))
+                .foregroundColor(.white.opacity(0.92))
                 .monospacedDigit()
                 .minimumScaleFactor(0.56)
                 .lineLimit(1)
@@ -1948,7 +1948,7 @@ private struct AgentUsageTokenPill: View {
         VStack(alignment: .leading, spacing: 5) {
             Text(appLocalized: title)
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.50))
+                .foregroundColor(.white.opacity(0.50))
             Text(verbatim: value)
                 .font(.system(size: 16, weight: .bold, design: .rounded))
                 .foregroundColor(tint.opacity(0.95))
@@ -1998,7 +1998,7 @@ private struct AgentUsageRankingRow: View {
 
                 Text(verbatim: item.name)
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.88))
+                    .foregroundColor(.white.opacity(0.88))
                     .lineLimit(1)
                     .truncationMode(.middle)
                     .layoutPriority(1)
@@ -2008,7 +2008,7 @@ private struct AgentUsageRankingRow: View {
 
                 Text(verbatim: AgentUsageFormat.integer(item.count))
                     .font(.system(size: 12, weight: .bold, design: .rounded))
-                    .foregroundColor(Color.islandForeground.opacity(0.72))
+                    .foregroundColor(.white.opacity(0.72))
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.62)
@@ -2018,7 +2018,7 @@ private struct AgentUsageRankingRow: View {
 
             GeometryReader { proxy in
                 RoundedRectangle(cornerRadius: 3, style: .continuous)
-                    .fill(Color.islandForeground.opacity(0.07))
+                    .fill(Color.white.opacity(0.07))
                     .overlay(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 3, style: .continuous)
                             .fill(tint.opacity(0.72))
@@ -2072,16 +2072,16 @@ private struct AgentUsageHeatmapView: View {
         HStack(alignment: .lastTextBaseline, spacing: 8) {
             Text(appLocalized: "最近 6 个月")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.70))
+                .foregroundColor(.white.opacity(0.70))
 
             Text(appLocalized: "每日活跃记录")
                 .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.42))
+                .foregroundColor(.white.opacity(0.42))
 
             if days.allSatisfy({ $0.activityCount == 0 }) {
                 Text(appLocalized: "还没有活跃记录")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.40))
+                    .foregroundColor(.white.opacity(0.40))
             }
 
             Spacer(minLength: 0)
@@ -2095,7 +2095,7 @@ private struct AgentUsageHeatmapView: View {
             ForEach(0..<7, id: \.self) { weekday in
                 Text(appLocalized: weekdayLabel(for: weekday))
                     .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(weekdayLabel(for: weekday).isEmpty ? 0 : 0.46))
+                    .foregroundColor(.white.opacity(weekdayLabel(for: weekday).isEmpty ? 0 : 0.46))
                     .frame(width: labelColumnWidth, height: layout.cellSize, alignment: .trailing)
             }
         }
@@ -2106,7 +2106,7 @@ private struct AgentUsageHeatmapView: View {
             ForEach(monthMarkers(for: weeks, layout: layout)) { marker in
                 Text(verbatim: marker.label)
                     .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.62))
+                    .foregroundColor(.white.opacity(0.62))
                     .frame(width: marker.width, alignment: .leading)
                     .offset(x: marker.x)
             }
@@ -2125,7 +2125,7 @@ private struct AgentUsageHeatmapView: View {
                                 .fill(heatmapGradient(for: day.activityCount))
                                 .overlay(alignment: .top) {
                                     RoundedRectangle(cornerRadius: layout.cornerRadius, style: .continuous)
-                                        .fill(Color.islandForeground.opacity(day.activityCount > 0 ? 0.13 : 0.04))
+                                        .fill(Color.white.opacity(day.activityCount > 0 ? 0.13 : 0.04))
                                         .frame(height: max(1, layout.cellSize * 0.24))
                                 }
                                 .frame(width: layout.cellSize, height: layout.cellSize)
@@ -2150,20 +2150,20 @@ private struct AgentUsageHeatmapView: View {
         HStack(spacing: 5) {
             Text(appLocalized: "低")
                 .font(.system(size: 10, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.42))
+                .foregroundColor(.white.opacity(0.42))
             ForEach(0..<5, id: \.self) { level in
                 RoundedRectangle(cornerRadius: layout.cornerRadius, style: .continuous)
                     .fill(heatmapGradient(forLevel: level))
                     .overlay(alignment: .top) {
                         RoundedRectangle(cornerRadius: layout.cornerRadius, style: .continuous)
-                            .fill(Color.islandForeground.opacity(level > 0 ? 0.13 : 0.04))
+                            .fill(Color.white.opacity(level > 0 ? 0.13 : 0.04))
                             .frame(height: max(1, layout.cellSize * 0.24))
                     }
                     .frame(width: layout.cellSize, height: layout.cellSize)
             }
             Text(appLocalized: "高")
                 .font(.system(size: 10, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.42))
+                .foregroundColor(.white.opacity(0.42))
         }
         .frame(height: legendHeight)
     }
@@ -2180,7 +2180,7 @@ private struct AgentUsageHeatmapView: View {
         let base = color(forLevel: level)
         return LinearGradient(
             colors: [
-                Color.islandForeground.opacity(level > 0 ? 0.18 : 0.05),
+                Color.white.opacity(level > 0 ? 0.18 : 0.05),
                 base.opacity(level > 0 ? 0.95 : 0.78),
                 base
             ],
@@ -2199,7 +2199,7 @@ private struct AgentUsageHeatmapView: View {
 
     private func color(forLevel level: Int) -> Color {
         switch level {
-        case 0: return Color.islandForeground.opacity(0.08)
+        case 0: return Color.white.opacity(0.08)
         case 1: return TerminalColors.cyan.opacity(0.34)
         case 2: return TerminalColors.cyan.opacity(0.58)
         case 3: return TerminalColors.blue.opacity(0.72)
@@ -2328,7 +2328,7 @@ private struct AgentUsageHeatmapView: View {
 private struct AgentUsageInsetDivider: View {
     var body: some View {
         Divider()
-            .overlay(Color.islandForeground.opacity(0.10))
+            .overlay(Color.white.opacity(0.10))
     }
 }
 
@@ -2339,10 +2339,10 @@ private struct AgentUsageEmptyLine: View {
         HStack(spacing: 8) {
             Image(systemName: "chart.xyaxis.line")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.34))
+                .foregroundColor(.white.opacity(0.34))
             Text(appLocalized: title)
                 .font(.system(size: 12, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.46))
+                .foregroundColor(.white.opacity(0.46))
             Spacer(minLength: 0)
         }
     }
@@ -2575,8 +2575,6 @@ private final class SettingsWindowBackdropView: NSView {
     private let sidebarTint = NSView()
     private let detailTint = NSView()
     private var sidebarWidth: CGFloat = 0
-    private var sidebarSurface = NSColor.clear
-    private var detailSurface = NSColor.clear
 
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
 
@@ -2626,18 +2624,6 @@ private final class SettingsWindowBackdropView: NSView {
         detailTint.frame = detailFrame
     }
 
-    override func viewDidChangeEffectiveAppearance() {
-        super.viewDidChangeEffectiveAppearance()
-        updateTintColors()
-    }
-
-    private func updateTintColors() {
-        effectiveAppearance.performAsCurrentDrawingAppearance {
-            sidebarTint.layer?.backgroundColor = sidebarSurface.cgColor
-            detailTint.layer?.backgroundColor = detailSurface.cgColor
-        }
-    }
-
     func configure(
         chromeStyle: ExperienceThemeSettingsChromeStyle,
         usesGlassMaterial: Bool,
@@ -2661,9 +2647,8 @@ private final class SettingsWindowBackdropView: NSView {
             detailMaterial.material = .hudWindow
         }
 
-        self.sidebarSurface = sidebarSurface
-        self.detailSurface = detailSurface
-        updateTintColors()
+        sidebarTint.layer?.backgroundColor = sidebarSurface.cgColor
+        detailTint.layer?.backgroundColor = detailSurface.cgColor
         needsLayout = true
     }
 }
@@ -2746,7 +2731,7 @@ private struct SettingsPanelContentView: View {
         .background {
             if presentation == .window {
                 SettingsWindowThemeBridge(
-                    preferredColorScheme: settings.appearanceMode.preferredColorScheme,
+                    preferredColorScheme: theme.visual.preferredColorScheme,
                     chromeStyle: theme.visual.settingsChromeStyle,
                     usesGlassMaterial: theme.visual.usesGlassMaterial,
                     sidebarSurface: theme.visual.settingsSidebarSurface,
@@ -2761,7 +2746,7 @@ private struct SettingsPanelContentView: View {
                 style: theme.visual.usesPixelGrid ? .circular : .continuous
             )
         )
-        .preferredColorScheme(settings.appearanceMode.preferredColorScheme)
+        .preferredColorScheme(theme.visual.preferredColorScheme)
         .environment(\.mascotAnimationsEnabled, arePreviewAnimationsActive)
         .onAppear {
             viewModel.refreshInitialState()
@@ -3019,7 +3004,7 @@ private struct SettingsPanelContentView: View {
                         if let title = section.title {
                             Text(appLocalized: title)
                                 .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(Color.islandForeground.opacity(0.32))
+                                .foregroundColor(.white.opacity(0.32))
                                 .padding(.horizontal, 12)
                         }
 
@@ -3064,11 +3049,11 @@ private struct SettingsPanelContentView: View {
         .overlay(alignment: .trailing) {
             if presentation == .window {
                 Rectangle()
-                    .fill(Color.islandForeground.opacity(0.075))
+                    .fill(Color.white.opacity(0.075))
                     .frame(width: 1)
                     .accessibilityHidden(true)
             } else {
-                sidebarShape.strokeBorder(Color.islandForeground.opacity(0.10), lineWidth: 1)
+                sidebarShape.strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
             }
         }
         .shadow(
@@ -3123,7 +3108,7 @@ private struct SettingsPanelContentView: View {
 
     private var sidebarAccentGlow: Color {
         theme.visual.settingsChromeStyle == .pingIsland
-            ? Color.islandForeground.opacity(0.16)
+            ? Color.white.opacity(0.16)
             : theme.visual.accent.opacity(0.16)
     }
 
@@ -3306,20 +3291,6 @@ private struct SettingsPanelContentView: View {
                 }
                 SettingsLineDivider()
 
-                SettingsInfoLine(
-                    title: "外观",
-                    subtitle: "跟随系统，或单独固定为浅色或深色；不改变体验主题和声音。"
-                ) {
-                    Picker("外观", selection: $settings.appearanceMode) {
-                        Text("跟随系统").tag(AppAppearanceMode.system)
-                        Text("浅色").tag(AppAppearanceMode.light)
-                        Text("深色").tag(AppAppearanceMode.dark)
-                    }
-                    .settingsMenuPicker(width: 140)
-                    .accessibilityIdentifier("settings.appearanceMode")
-                }
-                SettingsLineDivider()
-
                 SettingsToggleLine(
                     title: "登录时打开",
                     subtitle: "启动 macOS 后自动显示 Island",
@@ -3409,7 +3380,7 @@ private struct SettingsPanelContentView: View {
                 } accessory: {
                     Image(systemName: "power")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.72))
+                        .foregroundColor(.white.opacity(0.72))
                 }
             }
         }
@@ -3833,7 +3804,7 @@ private struct SettingsPanelContentView: View {
                                 Text(appLocalized: "添加自定义配置")
                                     .font(.system(size: 12, weight: .semibold))
                             }
-                            .foregroundColor(Color.islandForeground.opacity(0.7))
+                            .foregroundColor(.white.opacity(0.7))
                             .padding(.vertical, 4)
                             .contentShape(Rectangle())
                         }
@@ -3956,7 +3927,7 @@ private struct SettingsPanelContentView: View {
                 ) {
                     Image(systemName: "lock.shield")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.5))
+                        .foregroundColor(.white.opacity(0.5))
                 }
             }
 
@@ -4003,7 +3974,7 @@ private struct SettingsPanelContentView: View {
                     } accessory: {
                         Image(systemName: "doc.text.magnifyingglass")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.islandForeground.opacity(0.5))
+                            .foregroundColor(.white.opacity(0.5))
                     }
                 }
             }
@@ -4016,7 +3987,7 @@ private struct SettingsPanelContentView: View {
                 } accessory: {
                     Image(systemName: "arrow.up.right.square")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.5))
+                        .foregroundColor(.white.opacity(0.5))
                 }
 
                 SettingsLineDivider()
@@ -4030,11 +4001,11 @@ private struct SettingsPanelContentView: View {
                     if viewModel.isExportingLogs {
                         ProgressView()
                             .controlSize(.small)
-                            .tint(Color.islandForeground.opacity(0.8))
+                            .tint(.white.opacity(0.8))
                     } else {
                         Image(systemName: "square.and.arrow.up")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.islandForeground.opacity(0.5))
+                            .foregroundColor(.white.opacity(0.5))
                     }
                 }
             }
@@ -4048,10 +4019,10 @@ private struct SettingsPanelContentView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Text(appLocalized: "还没有添加任何远程主机")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.islandForeground)
+                            .foregroundColor(.white)
                         Text(appLocalized: "添加后，Island 会通过 SSH 安装远程 bridge、改写远程 hooks，并建立一个双向转发通道。")
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(Color.islandForeground.opacity(0.58))
+                            .foregroundColor(.white.opacity(0.58))
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(.horizontal, 18)
@@ -4103,7 +4074,7 @@ private struct SettingsPanelContentView: View {
                             Text(appLocalized: "添加远程主机")
                                 .font(.system(size: 12, weight: .semibold))
                         }
-                        .foregroundColor(Color.islandForeground.opacity(0.7))
+                        .foregroundColor(.white.opacity(0.7))
                         .padding(.vertical, 4)
                         .contentShape(Rectangle())
                     }
@@ -4116,7 +4087,7 @@ private struct SettingsPanelContentView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(appLocalized: "说明")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
 
                 VStack(alignment: .leading, spacing: 10) {
                     Text(appLocalized: "添加远程主机后，Island 会通过 SSH 检查环境、安装远程 bridge，并配置 Hooks。")
@@ -4124,7 +4095,7 @@ private struct SettingsPanelContentView: View {
                     Text(appLocalized: "如果不再需要远端集成，可在这里直接卸载 bridge；这会删除远端 `~/.ping-island` 并撤回 Island 托管的 hooks。")
                 }
                 .font(.system(size: 13, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.62))
+                .foregroundColor(.white.opacity(0.62))
                 .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -4286,7 +4257,7 @@ private struct SettingsPanelContentView: View {
         case .idle, .error:
             Image(systemName: "arrow.right.circle.fill")
                 .font(.system(size: 18))
-                .foregroundColor(Color.islandForeground.opacity(0.55))
+                .foregroundColor(.white.opacity(0.55))
         }
     }
 
@@ -4372,12 +4343,12 @@ private struct SidebarItemView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(appLocalized: category.title)
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(isSelected ? 0.94 : 0.80))
+                    .foregroundColor(.white.opacity(isSelected ? 0.94 : 0.80))
                     .lineLimit(1)
 
                 Text(appLocalized: category.subtitle)
                     .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(isSelected ? 0.60 : 0.42))
+                    .foregroundColor(.white.opacity(isSelected ? 0.60 : 0.42))
                     .lineLimit(1)
             }
 
@@ -4388,11 +4359,11 @@ private struct SidebarItemView: View {
         .padding(.vertical, 9)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(isSelected ? Color.islandForeground.opacity(0.12) : Color.islandForeground.opacity(0.02))
+                .fill(isSelected ? Color.white.opacity(0.12) : Color.white.opacity(0.02))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(Color.islandForeground.opacity(isSelected ? 0.10 : 0.04), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(isSelected ? 0.10 : 0.04), lineWidth: 1)
         )
         .shadow(color: isSelected ? category.tint.opacity(0.18) : .clear, radius: 14, y: 8)
         .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -4616,7 +4587,7 @@ private struct SettingsSectionCard<Content: View>: View {
 private struct SettingsLineDivider: View {
     var body: some View {
         Divider()
-            .overlay(Color.islandForeground.opacity(0.10))
+            .overlay(Color.white.opacity(0.10))
             .padding(.horizontal, 18)
     }
 }
@@ -4642,11 +4613,11 @@ private struct HookManagementLine: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(appLocalized: title)
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color.islandForeground)
+                        .foregroundColor(.white)
 
                     Text(appLocalized: subtitle)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color.islandForeground.opacity(0.58))
+                        .foregroundColor(.white.opacity(0.58))
                         .fixedSize(horizontal: false, vertical: true)
 
                     if let noticeMessage {
@@ -4671,16 +4642,16 @@ private struct HookManagementLine: View {
 
                 Text(appLocalized: isInstalled ? "已安装" : "未安装")
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(isInstalled ? tint : Color.islandForeground.opacity(0.65))
+                    .foregroundColor(isInstalled ? tint : .white.opacity(0.65))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .background(
                         Capsule(style: .continuous)
-                            .fill((isInstalled ? tint : Color.islandForeground).opacity(isInstalled ? 0.18 : 0.08))
+                            .fill((isInstalled ? tint : .white).opacity(isInstalled ? 0.18 : 0.08))
                     )
                     .overlay(
                         Capsule(style: .continuous)
-                            .strokeBorder((isInstalled ? tint : Color.islandForeground).opacity(isInstalled ? 0.28 : 0.12), lineWidth: 1)
+                            .strokeBorder((isInstalled ? tint : .white).opacity(isInstalled ? 0.28 : 0.12), lineWidth: 1)
                     )
             }
 
@@ -4731,7 +4702,7 @@ private struct HookManagementLine: View {
 
                     Text(reinstallFeedback.message)
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.76))
+                        .foregroundColor(.white.opacity(0.76))
                 }
                 .padding(.horizontal, 2)
             }
@@ -4766,11 +4737,11 @@ private struct CustomHookInstallationLine: View {
                 } else {
                     Image(systemName: "folder.badge.gearshape")
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(Color.islandForeground)
+                        .foregroundColor(.white)
                         .frame(width: 34, height: 34)
                         .background(
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(Color.islandForeground.opacity(0.08))
+                                .fill(Color.white.opacity(0.08))
                         )
                 }
 
@@ -4778,7 +4749,7 @@ private struct CustomHookInstallationLine: View {
                     HStack(spacing: 6) {
                         Text(appLocalized: installation.profileTitle)
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.islandForeground)
+                            .foregroundColor(.white)
 
                         Text(appLocalized: "自定义")
                             .font(.system(size: 10, weight: .bold))
@@ -4793,7 +4764,7 @@ private struct CustomHookInstallationLine: View {
 
                     Text(installation.customPath)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color.islandForeground.opacity(0.5))
+                        .foregroundColor(.white.opacity(0.5))
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
@@ -4848,13 +4819,13 @@ private struct CustomHookInstallSheet: View {
         VStack(alignment: .leading, spacing: 20) {
             Text(appLocalized: "添加自定义 Hook 配置")
                 .font(.system(size: 16, weight: .bold))
-                .foregroundColor(Color.islandForeground)
+                .foregroundColor(.white)
 
             VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(appLocalized: "选择应用")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.7))
+                        .foregroundColor(.white.opacity(0.7))
 
                     Picker("", selection: $selectedProfileID) {
                         Text(appLocalized: "请选择...").tag("")
@@ -4869,37 +4840,37 @@ private struct CustomHookInstallSheet: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(appLocalized: "安装目录")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.7))
+                        .foregroundColor(.white.opacity(0.7))
 
                     HStack(spacing: 8) {
                         TextField("", text: $customPath, prompt: Text(verbatim: installPathPlaceholder))
                             .textFieldStyle(.plain)
                             .font(.system(size: 12, weight: .medium, design: .monospaced))
-                            .foregroundColor(Color.islandForeground)
+                            .foregroundColor(.white)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 8)
                             .background(
                                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .fill(Color.islandForeground.opacity(0.06))
+                                    .fill(.white.opacity(0.06))
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .strokeBorder(Color.islandForeground.opacity(0.1), lineWidth: 1)
+                                    .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                             )
 
                         Button(action: selectDirectory) {
                             Text(appLocalized: "选择目录")
                                 .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(Color.islandForeground.opacity(0.8))
+                                .foregroundColor(.white.opacity(0.8))
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
                                 .background(
                                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                        .fill(Color.islandForeground.opacity(0.08))
+                                        .fill(.white.opacity(0.08))
                                 )
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                        .strokeBorder(Color.islandForeground.opacity(0.12), lineWidth: 1)
+                                        .strokeBorder(.white.opacity(0.12), lineWidth: 1)
                                 )
                         }
                         .buttonStyle(.plain)
@@ -4908,7 +4879,7 @@ private struct CustomHookInstallSheet: View {
                     if let resolvedFileName {
                         Text(resolvedInstallTargetDescription(resolvedFileName: resolvedFileName))
                             .font(.system(size: 10, weight: .medium, design: .monospaced))
-                            .foregroundColor(Color.islandForeground.opacity(0.4))
+                            .foregroundColor(.white.opacity(0.4))
                             .lineLimit(1)
                             .truncationMode(.middle)
                     }
@@ -4916,7 +4887,7 @@ private struct CustomHookInstallSheet: View {
                     if let installHint {
                         Text(verbatim: installHint)
                             .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(Color.islandForeground.opacity(0.45))
+                            .foregroundColor(.white.opacity(0.45))
                     }
                 }
             }
@@ -4927,16 +4898,16 @@ private struct CustomHookInstallSheet: View {
                 Button(action: onDismiss) {
                     Text(appLocalized: "取消")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.7))
+                        .foregroundColor(.white.opacity(0.7))
                         .padding(.horizontal, 18)
                         .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(Color.islandForeground.opacity(0.06))
+                                .fill(.white.opacity(0.06))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .strokeBorder(Color.islandForeground.opacity(0.1), lineWidth: 1)
+                                .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                         )
                 }
                 .buttonStyle(.plain)
@@ -4944,16 +4915,16 @@ private struct CustomHookInstallSheet: View {
                 Button(action: install) {
                     Text(appLocalized: "安装")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(canInstall ? Color.islandForeground : Color.islandForeground.opacity(0.4))
+                        .foregroundColor(canInstall ? .white : .white.opacity(0.4))
                         .padding(.horizontal, 18)
                         .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(canInstall ? TerminalColors.blue.opacity(0.5) : Color.islandForeground.opacity(0.04))
+                                .fill(canInstall ? TerminalColors.blue.opacity(0.5) : .white.opacity(0.04))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .strokeBorder(canInstall ? TerminalColors.blue.opacity(0.5) : Color.islandForeground.opacity(0.08), lineWidth: 1)
+                                .strokeBorder(canInstall ? TerminalColors.blue.opacity(0.5) : .white.opacity(0.08), lineWidth: 1)
                         )
                 }
                 .buttonStyle(.plain)
@@ -4963,7 +4934,7 @@ private struct CustomHookInstallSheet: View {
         .padding(24)
         .frame(width: 460)
         .background(Color(nsColor: .windowBackgroundColor))
-        .preferredColorScheme(AppSettings.appearanceMode.preferredColorScheme)
+        .preferredColorScheme(.dark)
     }
 
     private var resolvedFileName: String? {
@@ -5116,7 +5087,7 @@ private struct HookInstallOptionsSheet: View {
         .padding(24)
         .frame(width: 520)
         .background(Color(nsColor: .windowBackgroundColor))
-        .preferredColorScheme(AppSettings.appearanceMode.preferredColorScheme)
+        .preferredColorScheme(.dark)
     }
 
     private var header: some View {
@@ -5126,11 +5097,11 @@ private struct HookInstallOptionsSheet: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(verbatim: profile.title)
                     .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
 
                 Text(appLocalized: headerSubtitle)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.6))
+                    .foregroundColor(.white.opacity(0.6))
                     .fixedSize(horizontal: false, vertical: true)
             }
 
@@ -5149,18 +5120,18 @@ private struct HookInstallOptionsSheet: View {
 
                 if category != profile.availableEventCategories.last {
                     Divider()
-                        .overlay(Color.islandForeground.opacity(0.08))
+                        .overlay(Color.white.opacity(0.08))
                         .padding(.horizontal, 14)
                 }
             }
         }
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.islandForeground.opacity(0.04))
+                .fill(Color.white.opacity(0.04))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(Color.islandForeground.opacity(0.08), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
         )
     }
 
@@ -5172,7 +5143,7 @@ private struct HookInstallOptionsSheet: View {
                     if !events.isEmpty {
                         Text(appLocalized: category.title)
                             .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(Color.islandForeground.opacity(0.5))
+                            .foregroundColor(.white.opacity(0.5))
                             .padding(.horizontal, 14)
                             .padding(.top, 12)
                             .padding(.bottom, 4)
@@ -5190,25 +5161,25 @@ private struct HookInstallOptionsSheet: View {
             .padding(.bottom, 8)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.islandForeground.opacity(0.03))
+                    .fill(Color.white.opacity(0.03))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(Color.islandForeground.opacity(0.06), lineWidth: 1)
+                    .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
             )
         } label: {
             Text(appLocalized: "高级 — 按事件单独配置")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.78))
+                .foregroundColor(.white.opacity(0.78))
         }
-        .tint(Color.islandForeground.opacity(0.6))
+        .tint(.white.opacity(0.6))
     }
 
     private var footer: some View {
         HStack(spacing: 12) {
             Text(appLocalized: footerHint)
                 .font(.system(size: 10, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.4))
+                .foregroundColor(.white.opacity(0.4))
                 .fixedSize(horizontal: false, vertical: true)
 
             Spacer()
@@ -5216,16 +5187,16 @@ private struct HookInstallOptionsSheet: View {
             Button(action: onDismiss) {
                 Text(appLocalized: "取消")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.7))
+                    .foregroundColor(.white.opacity(0.7))
                     .padding(.horizontal, 18)
                     .padding(.vertical, 8)
                     .background(
                         RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(Color.islandForeground.opacity(0.06))
+                            .fill(.white.opacity(0.06))
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .strokeBorder(Color.islandForeground.opacity(0.1), lineWidth: 1)
+                            .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                     )
             }
             .buttonStyle(.plain)
@@ -5233,16 +5204,16 @@ private struct HookInstallOptionsSheet: View {
             Button(action: confirm) {
                 Text(appLocalized: confirmTitle)
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(canConfirm ? Color.islandForeground : Color.islandForeground.opacity(0.4))
+                    .foregroundColor(canConfirm ? .white : .white.opacity(0.4))
                     .padding(.horizontal, 18)
                     .padding(.vertical, 8)
                     .background(
                         RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(canConfirm ? brandTint(profile.brand).opacity(0.5) : Color.islandForeground.opacity(0.04))
+                            .fill(canConfirm ? brandTint(profile.brand).opacity(0.5) : .white.opacity(0.04))
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .strokeBorder(canConfirm ? brandTint(profile.brand).opacity(0.55) : Color.islandForeground.opacity(0.08), lineWidth: 1)
+                            .strokeBorder(canConfirm ? brandTint(profile.brand).opacity(0.55) : .white.opacity(0.08), lineWidth: 1)
                     )
             }
             .buttonStyle(.plain)
@@ -5323,20 +5294,20 @@ private struct CategoryToggleRow: View {
         HStack(alignment: .center, spacing: 14) {
             Image(systemName: category.iconSymbolName)
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.78))
+                .foregroundColor(.white.opacity(0.78))
                 .frame(width: 28, height: 28)
                 .background(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color.islandForeground.opacity(0.06))
+                        .fill(.white.opacity(0.06))
                 )
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(appLocalized: category.title)
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
                 Text(appLocalized: category.subtitle)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.55))
+                    .foregroundColor(.white.opacity(0.55))
                     .fixedSize(horizontal: false, vertical: true)
             }
 
@@ -5365,7 +5336,7 @@ private struct CategoryToggleRow: View {
         case .off:
             Image(systemName: "circle")
                 .font(.system(size: 22, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.3))
+                .foregroundColor(.white.opacity(0.3))
         }
     }
 }
@@ -5379,17 +5350,17 @@ private struct EventToggleRow: View {
         HStack(alignment: .center, spacing: 12) {
             Text(verbatim: event.name)
                 .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                .foregroundColor(Color.islandForeground.opacity(0.86))
+                .foregroundColor(.white.opacity(0.86))
 
             if let timeout = event.timeout {
                 Text(verbatim: "\(timeout)s")
                     .font(.system(size: 10, weight: .medium, design: .monospaced))
-                    .foregroundColor(Color.islandForeground.opacity(0.45))
+                    .foregroundColor(.white.opacity(0.45))
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
                     .background(
                         Capsule(style: .continuous)
-                            .fill(Color.islandForeground.opacity(0.05))
+                            .fill(.white.opacity(0.05))
                     )
             }
 
@@ -5398,7 +5369,7 @@ private struct EventToggleRow: View {
             Button(action: onToggle) {
                 Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(isOn ? TerminalColors.green : Color.islandForeground.opacity(0.3))
+                    .foregroundColor(isOn ? TerminalColors.green : .white.opacity(0.3))
             }
             .buttonStyle(.plain)
         }
@@ -5436,7 +5407,7 @@ private struct RemoteHostManagementLine: View {
             HStack(alignment: .center, spacing: 14) {
                 Image(systemName: "network")
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
                     .frame(width: 34, height: 34)
                     .background(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -5447,7 +5418,7 @@ private struct RemoteHostManagementLine: View {
                     HStack(spacing: 6) {
                         Text(endpoint.resolvedTitle)
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.islandForeground)
+                            .foregroundColor(.white)
 
                         Text(appLocalized: runtimeState.phase.titleKey)
                             .font(.system(size: 10, weight: .bold))
@@ -5471,20 +5442,20 @@ private struct RemoteHostManagementLine: View {
                                     .font(.system(size: 9, weight: .semibold))
                             }
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(Color.islandForeground.opacity(0.52))
+                            .foregroundColor(.white.opacity(0.52))
                         }
                         .buttonStyle(.plain)
                     } else {
                         Text(endpoint.sshTarget)
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(Color.islandForeground.opacity(0.52))
+                            .foregroundColor(.white.opacity(0.52))
                             .lineLimit(1)
                             .truncationMode(.middle)
                     }
 
                     Text(detailText)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color.islandForeground.opacity(0.60))
+                        .foregroundColor(.white.opacity(0.60))
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
@@ -5614,7 +5585,7 @@ private struct RemoteHostManagementLine: View {
         case .uninstalling:
             return TerminalColors.amber
         case .disconnected:
-            return Color.islandForeground.opacity(0.68)
+            return .white.opacity(0.68)
         }
     }
 
@@ -5658,7 +5629,7 @@ private struct AddRemoteHostSheet: View {
         VStack(alignment: .leading, spacing: 20) {
             Text(appLocalized: "添加远程主机")
                 .font(.system(size: 16, weight: .bold))
-                .foregroundColor(Color.islandForeground)
+                .foregroundColor(.white)
 
                 VStack(alignment: .leading, spacing: 14) {
                 remoteField(title: "显示名称（可选）", placeholder: "例如 GPU Box", text: $displayName)
@@ -5668,12 +5639,12 @@ private struct AddRemoteHostSheet: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(appLocalized: "密码（可选）")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.7))
+                        .foregroundColor(.white.opacity(0.7))
 
                     SecureField("", text: $password, prompt: Text(appLocalized: "连接成功后后续可直接重连"))
                         .textFieldStyle(.plain)
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color.islandForeground)
+                        .foregroundColor(.white)
                         .submitLabel(.go)
                         .onSubmit {
                             addAndConnect()
@@ -5682,11 +5653,11 @@ private struct AddRemoteHostSheet: View {
                         .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(Color.islandForeground.opacity(0.06))
+                                .fill(.white.opacity(0.06))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .strokeBorder(Color.islandForeground.opacity(0.1), lineWidth: 1)
+                                .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                         )
                 }
 
@@ -5704,16 +5675,16 @@ private struct AddRemoteHostSheet: View {
                 Button(action: onDismiss) {
                     Text(appLocalized: "取消")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.7))
+                        .foregroundColor(.white.opacity(0.7))
                         .padding(.horizontal, 18)
                         .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(Color.islandForeground.opacity(0.06))
+                                .fill(.white.opacity(0.06))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .strokeBorder(Color.islandForeground.opacity(0.1), lineWidth: 1)
+                                .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                         )
                 }
                 .buttonStyle(.plain)
@@ -5721,16 +5692,16 @@ private struct AddRemoteHostSheet: View {
                 Button(action: addAndConnect) {
                     Text(appLocalized: "保存并连接")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(canAdd ? Color.islandForeground : Color.islandForeground.opacity(0.4))
+                        .foregroundColor(canAdd ? .white : .white.opacity(0.4))
                         .padding(.horizontal, 18)
                         .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(canAdd ? TerminalColors.blue.opacity(0.5) : Color.islandForeground.opacity(0.04))
+                                .fill(canAdd ? TerminalColors.blue.opacity(0.5) : .white.opacity(0.04))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .strokeBorder(canAdd ? TerminalColors.blue.opacity(0.5) : Color.islandForeground.opacity(0.08), lineWidth: 1)
+                                .strokeBorder(canAdd ? TerminalColors.blue.opacity(0.5) : .white.opacity(0.08), lineWidth: 1)
                         )
                 }
                 .buttonStyle(.plain)
@@ -5741,7 +5712,7 @@ private struct AddRemoteHostSheet: View {
         .padding(24)
         .frame(width: 460)
         .background(Color(nsColor: .windowBackgroundColor))
-        .preferredColorScheme(AppSettings.appearanceMode.preferredColorScheme)
+        .preferredColorScheme(.dark)
     }
 
     @ViewBuilder
@@ -5749,21 +5720,21 @@ private struct AddRemoteHostSheet: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(appLocalized: title)
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.7))
+                .foregroundColor(.white.opacity(0.7))
 
             TextField("", text: text, prompt: Text(appLocalized: placeholder))
                 .textFieldStyle(.plain)
                 .font(.system(size: 12, weight: .medium))
-                .foregroundColor(Color.islandForeground)
+                .foregroundColor(.white)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
                 .background(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color.islandForeground.opacity(0.06))
+                        .fill(.white.opacity(0.06))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .strokeBorder(Color.islandForeground.opacity(0.1), lineWidth: 1)
+                        .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                 )
         }
     }
@@ -5822,7 +5793,7 @@ private struct RemotePasswordPromptSheet: View {
         VStack(alignment: .leading, spacing: 20) {
             Text(verbatim: AppLocalization.format(request.action.titleFormat, request.endpoint.resolvedTitle))
                 .font(.system(size: 16, weight: .bold))
-                .foregroundColor(Color.islandForeground)
+                .foregroundColor(.white)
 
             if let sshURL = request.endpoint.sshURL {
                 Link(destination: sshURL) {
@@ -5835,19 +5806,19 @@ private struct RemotePasswordPromptSheet: View {
                             .font(.system(size: 9, weight: .semibold))
                     }
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundColor(Color.islandForeground.opacity(0.56))
+                    .foregroundColor(.white.opacity(0.56))
                 }
                 .buttonStyle(.plain)
             } else {
                 Text(request.endpoint.sshTarget)
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundColor(Color.islandForeground.opacity(0.56))
+                    .foregroundColor(.white.opacity(0.56))
             }
 
             SecureField("", text: $password, prompt: Text(appLocalized: "输入 SSH 密码"))
                 .textFieldStyle(.plain)
                 .font(.system(size: 12, weight: .medium))
-                .foregroundColor(Color.islandForeground)
+                .foregroundColor(.white)
                 .submitLabel(.go)
                 .onSubmit {
                     submitPassword()
@@ -5856,11 +5827,11 @@ private struct RemotePasswordPromptSheet: View {
                 .padding(.vertical, 8)
                 .background(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color.islandForeground.opacity(0.06))
+                        .fill(.white.opacity(0.06))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .strokeBorder(Color.islandForeground.opacity(0.1), lineWidth: 1)
+                        .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                 )
 
             HStack(spacing: 12) {
@@ -5869,16 +5840,16 @@ private struct RemotePasswordPromptSheet: View {
                 Button(action: onDismiss) {
                     Text(appLocalized: "取消")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.7))
+                        .foregroundColor(.white.opacity(0.7))
                         .padding(.horizontal, 18)
                         .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(Color.islandForeground.opacity(0.06))
+                                .fill(.white.opacity(0.06))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .strokeBorder(Color.islandForeground.opacity(0.1), lineWidth: 1)
+                                .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                         )
                 }
                 .buttonStyle(.plain)
@@ -5886,16 +5857,16 @@ private struct RemotePasswordPromptSheet: View {
                 Button(action: submitPassword) {
                     Text(appLocalized: request.action.submitTitle)
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(password.isEmpty ? Color.islandForeground.opacity(0.4) : Color.islandForeground)
+                        .foregroundColor(password.isEmpty ? .white.opacity(0.4) : .white)
                         .padding(.horizontal, 18)
                         .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(password.isEmpty ? Color.islandForeground.opacity(0.04) : buttonTint.opacity(0.5))
+                                .fill(password.isEmpty ? .white.opacity(0.04) : buttonTint.opacity(0.5))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .strokeBorder(password.isEmpty ? Color.islandForeground.opacity(0.08) : buttonTint.opacity(0.5), lineWidth: 1)
+                                .strokeBorder(password.isEmpty ? .white.opacity(0.08) : buttonTint.opacity(0.5), lineWidth: 1)
                         )
                 }
                 .buttonStyle(.plain)
@@ -5906,7 +5877,7 @@ private struct RemotePasswordPromptSheet: View {
         .padding(24)
         .frame(width: 420)
         .background(Color(nsColor: .windowBackgroundColor))
-        .preferredColorScheme(AppSettings.appearanceMode.preferredColorScheme)
+        .preferredColorScheme(.dark)
     }
 
     private func submitPassword() {
@@ -5940,11 +5911,11 @@ private struct IDEExtensionManagementLine: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(appLocalized: profile.title)
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color.islandForeground)
+                        .foregroundColor(.white)
 
                     Text(appLocalized: profile.subtitle)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color.islandForeground.opacity(0.58))
+                        .foregroundColor(.white.opacity(0.58))
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
@@ -5952,16 +5923,16 @@ private struct IDEExtensionManagementLine: View {
 
                 Text(appLocalized: isInstalled ? "已安装" : "未安装")
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(isInstalled ? tint : Color.islandForeground.opacity(0.65))
+                    .foregroundColor(isInstalled ? tint : .white.opacity(0.65))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .background(
                         Capsule(style: .continuous)
-                            .fill((isInstalled ? tint : Color.islandForeground).opacity(isInstalled ? 0.18 : 0.08))
+                            .fill((isInstalled ? tint : .white).opacity(isInstalled ? 0.18 : 0.08))
                     )
                     .overlay(
                         Capsule(style: .continuous)
-                            .strokeBorder((isInstalled ? tint : Color.islandForeground).opacity(isInstalled ? 0.28 : 0.12), lineWidth: 1)
+                            .strokeBorder((isInstalled ? tint : .white).opacity(isInstalled ? 0.28 : 0.12), lineWidth: 1)
                     )
             }
 
@@ -5978,7 +5949,7 @@ private struct IDEExtensionManagementLine: View {
             if !isInstalled {
                 Text(appLocalized: "安装完成后，如编辑器尚未识别扩展，请重启对应 IDE 再点击“授权”。")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.44))
+                    .foregroundColor(.white.opacity(0.44))
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -6029,11 +6000,11 @@ private struct SettingsClientIcon: View {
         } else {
             Image(systemName: iconSymbolName)
                 .font(.system(size: 18, weight: .bold))
-                .foregroundColor(Color.islandForeground)
+                .foregroundColor(.white)
                 .frame(width: 34, height: 34)
                 .background(
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(Color.islandForeground.opacity(0.08))
+                        .fill(Color.white.opacity(0.08))
                 )
         }
     }
@@ -6072,11 +6043,11 @@ private struct LabsEmptyStateView: View {
             VStack(alignment: .center, spacing: 6) {
                 Text("暂无可用实验")
                     .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
 
                 Text("实验室主要承载一些试验性特性，稳定性不做保障。当前没有开放中的实验项目。")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.58))
+                    .foregroundColor(.white.opacity(0.58))
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -6102,7 +6073,7 @@ private func ideTint(_ profileID: String) -> Color {
     case "qoder-extension":
         return Color(red: 0.12, green: 0.88, blue: 0.56)
     default:
-        return Color.islandForeground.opacity(0.72)
+        return Color.white.opacity(0.72)
     }
 }
 
@@ -6119,12 +6090,12 @@ private struct HookManagementButton: View {
                 if isLoading {
                     ProgressView()
                         .controlSize(.small)
-                        .tint(Color.islandForeground.opacity(0.86))
+                        .tint(.white.opacity(0.86))
                 }
 
                 Text(appLocalized: title)
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
@@ -6153,7 +6124,7 @@ private struct SettingsToggleLine: View {
             HStack(alignment: .center, spacing: 16) {
                 Text(appLocalized: title)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
 
                 Spacer(minLength: 12)
 
@@ -6165,7 +6136,7 @@ private struct SettingsToggleLine: View {
             if let subtitle {
                 Text(appLocalized: subtitle)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.58))
+                    .foregroundColor(.white.opacity(0.58))
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -6203,7 +6174,7 @@ private struct SettingsInfoLine<Accessory: View>: View {
             HStack(alignment: .center, spacing: 16) {
                 Text(appLocalized: title)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
 
                 Spacer(minLength: 12)
 
@@ -6213,7 +6184,7 @@ private struct SettingsInfoLine<Accessory: View>: View {
             if let subtitle {
                 Text(appLocalized: subtitle)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.58))
+                    .foregroundColor(.white.opacity(0.58))
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -6236,7 +6207,7 @@ private struct SoundPackSourceInfoLine<Accessory: View>: View {
             HStack(alignment: .center, spacing: 16) {
                 Text(appLocalized: "当前主题包")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
 
                 Spacer(minLength: 12)
 
@@ -6245,7 +6216,7 @@ private struct SoundPackSourceInfoLine<Accessory: View>: View {
 
             Text(appLocalized: "自动扫描以下目录，也支持手动导入本地目录。")
                 .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.58))
+                .foregroundColor(.white.opacity(0.58))
                 .fixedSize(horizontal: false, vertical: true)
 
             VStack(alignment: .leading, spacing: 6) {
@@ -6272,12 +6243,12 @@ private struct SettingsActionLine<Accessory: View>: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(appLocalized: title)
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color.islandForeground)
+                        .foregroundColor(.white)
 
                     if let subtitle {
                         Text(appLocalized: subtitle)
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(Color.islandForeground.opacity(0.58))
+                            .foregroundColor(.white.opacity(0.58))
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
@@ -6306,7 +6277,7 @@ private struct SoundPackImportActionLine<Accessory: View>: View {
                 HStack(alignment: .center, spacing: 16) {
                     Text(appLocalized: "导入本地主题包")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color.islandForeground)
+                        .foregroundColor(.white)
 
                     Spacer(minLength: 12)
 
@@ -6315,13 +6286,13 @@ private struct SoundPackImportActionLine<Accessory: View>: View {
 
                 Text(appLocalized: "选择一个本地目录，导入后会加入可选列表。")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.58))
+                    .foregroundColor(.white.opacity(0.58))
                     .fixedSize(horizontal: false, vertical: true)
 
                 VStack(alignment: .leading, spacing: 5) {
                     Text(appLocalized: "目录内需要包含以下清单文件")
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.42))
+                        .foregroundColor(.white.opacity(0.42))
 
                     SettingsCodeCapsule(text: "openpeon.json", systemImage: "doc.text")
                 }
@@ -6343,11 +6314,11 @@ private struct SettingsCodeCapsule: View {
         HStack(spacing: 8) {
             Image(systemName: systemImage)
                 .font(.system(size: 10, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.42))
+                .foregroundColor(.white.opacity(0.42))
 
             Text(text)
                 .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                .foregroundColor(Color.islandForeground.opacity(0.74))
+                .foregroundColor(.white.opacity(0.74))
                 .lineLimit(1)
                 .truncationMode(.middle)
         }
@@ -6356,11 +6327,11 @@ private struct SettingsCodeCapsule: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color.islandForeground.opacity(0.05))
+                .fill(Color.white.opacity(0.05))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(Color.islandForeground.opacity(0.08), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
         )
     }
 }
@@ -6373,13 +6344,13 @@ private struct SettingsValueLine: View {
         HStack(spacing: 16) {
             Text(appLocalized: title)
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(Color.islandForeground)
+                .foregroundColor(.white)
 
             Spacer(minLength: 12)
 
             Text(value)
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.72))
+                .foregroundColor(.white.opacity(0.72))
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
@@ -6401,19 +6372,19 @@ private struct SettingsSliderLine: View {
             HStack(alignment: .firstTextBaseline, spacing: 16) {
                 Text(appLocalized: title)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
 
                 Spacer(minLength: 12)
 
                 Text(format(value))
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.72))
+                    .foregroundColor(.white.opacity(0.72))
             }
 
             if let subtitle {
                 Text(appLocalized: subtitle)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.58))
+                    .foregroundColor(.white.opacity(0.58))
                     .fixedSize(horizontal: false, vertical: true)
             }
 
@@ -6425,14 +6396,14 @@ private struct SettingsSliderLine: View {
                 HStack(spacing: 0) {
                     ForEach(0..<17, id: \.self) { _ in
                         Capsule()
-                            .fill(Color.islandForeground.opacity(0.28))
+                            .fill(Color.white.opacity(0.28))
                             .frame(width: 1, height: 6)
 
                         Spacer(minLength: 0)
                     }
 
                     Capsule()
-                        .fill(Color.islandForeground.opacity(0.28))
+                        .fill(Color.white.opacity(0.28))
                         .frame(width: 1, height: 6)
                 }
                 .padding(.horizontal, 6)
@@ -6475,11 +6446,11 @@ private struct ShortcutRecorderControl: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(appLocalized: action.title)
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color.islandForeground)
+                        .foregroundColor(.white)
 
                     Text(appLocalized: action.subtitle)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color.islandForeground.opacity(0.58))
+                        .foregroundColor(.white.opacity(0.58))
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
@@ -6491,15 +6462,15 @@ private struct ShortcutRecorderControl: View {
             HStack(alignment: .center, spacing: 8) {
                 Text(appLocalized: "当前键位")
                     .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(Color.islandForeground.opacity(0.40))
+                    .foregroundColor(.white.opacity(0.40))
 
                 if let shortcut {
                     ShortcutVisualLabel(
                         shortcut: shortcut,
                         fontSize: 11,
-                        foregroundColor: Color.islandForeground.opacity(0.92),
+                        foregroundColor: .white.opacity(0.92),
                         keyBackground: Color.black.opacity(0.28),
-                        keyBorder: Color.islandForeground.opacity(0.08),
+                        keyBorder: Color.white.opacity(0.08),
                         keyMinWidth: 24,
                         keyHorizontalPadding: 7,
                         keyVerticalPadding: 5,
@@ -6508,7 +6479,7 @@ private struct ShortcutRecorderControl: View {
                 } else {
                     Text(appLocalized: "未设置")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.42))
+                        .foregroundColor(.white.opacity(0.42))
                 }
 
                 Spacer(minLength: 12)
@@ -6542,7 +6513,7 @@ private struct ShortcutRecorderControl: View {
 
             Text(appLocalized: helperTextKey ?? (isRecording ? "录制中，按 Esc 取消，Delete 清空" : "需要同时按下至少一个修饰键"))
                 .font(.system(size: 10, weight: .medium))
-                .foregroundColor(isRecording ? TerminalColors.green.opacity(0.90) : Color.islandForeground.opacity(0.42))
+                .foregroundColor(isRecording ? TerminalColors.green.opacity(0.90) : .white.opacity(0.42))
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .onDisappear {
@@ -6561,17 +6532,17 @@ private struct ShortcutRecorderControl: View {
                 Text(appLocalized: isRecording ? "按下新快捷键" : "点击录制")
                     .font(.system(size: 12, weight: .semibold))
             }
-            .foregroundColor(isRecording ? .black : Color.islandForeground.opacity(0.88))
+            .foregroundColor(isRecording ? .black : .white.opacity(0.88))
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(isRecording ? TerminalColors.green.opacity(0.96) : Color.islandForeground.opacity(0.08))
+                    .fill(isRecording ? TerminalColors.green.opacity(0.96) : Color.white.opacity(0.08))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .strokeBorder(
-                        isRecording ? TerminalColors.green.opacity(0.9) : Color.islandForeground.opacity(0.10),
+                        isRecording ? TerminalColors.green.opacity(0.9) : Color.white.opacity(0.10),
                         lineWidth: 1
                     )
             )
@@ -6640,15 +6611,15 @@ private struct ShortcutIconButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 10, weight: .bold))
-            .foregroundColor(Color.islandForeground.opacity(configuration.isPressed ? 0.76 : 0.88))
+            .foregroundColor(.white.opacity(configuration.isPressed ? 0.76 : 0.88))
             .frame(width: 28, height: 28)
             .background(
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(Color.islandForeground.opacity(configuration.isPressed ? 0.11 : 0.055))
+                    .fill(Color.white.opacity(configuration.isPressed ? 0.11 : 0.055))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .strokeBorder(Color.islandForeground.opacity(0.09), lineWidth: 1)
+                    .strokeBorder(Color.white.opacity(0.09), lineWidth: 1)
             )
     }
 }
@@ -6726,13 +6697,13 @@ struct IslandSurfaceModeSelector: View {
             if let title {
                 Text(appLocalized: title)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color.islandForeground)
+                    .foregroundColor(.white)
             }
 
             if let subtitle {
                 Text(appLocalized: subtitle)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.islandForeground.opacity(0.58))
+                    .foregroundColor(.white.opacity(0.58))
                     .fixedSize(horizontal: false, vertical: true)
             }
 
@@ -6783,11 +6754,11 @@ struct IslandSurfaceModeCard: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(appLocalized: mode.title)
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(Color.islandForeground)
+                            .foregroundColor(.white)
 
                         Text(appLocalized: mode.subtitle)
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(Color.islandForeground.opacity(0.62))
+                            .foregroundColor(.white.opacity(0.62))
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
@@ -6795,18 +6766,18 @@ struct IslandSurfaceModeCard: View {
 
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(isSelected ? accentColor : Color.islandForeground.opacity(0.26))
+                        .foregroundColor(isSelected ? accentColor : .white.opacity(0.26))
                 }
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Color.islandForeground.opacity(isSelected ? 0.09 : 0.035))
+                    .fill(Color.white.opacity(isSelected ? 0.09 : 0.035))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .strokeBorder(isSelected ? accentColor.opacity(0.56) : Color.islandForeground.opacity(0.08), lineWidth: 1)
+                    .strokeBorder(isSelected ? accentColor.opacity(0.56) : Color.white.opacity(0.08), lineWidth: 1)
             )
             .shadow(color: isSelected ? accentColor.opacity(0.18) : .clear, radius: 16, y: 8)
             .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -6847,7 +6818,7 @@ struct IslandSurfaceModeCard: View {
     }
 
     private var previewBorder: Color {
-        isSelected ? accentColor.opacity(0.42) : Color.islandForeground.opacity(0.10)
+        isSelected ? accentColor.opacity(0.42) : Color.white.opacity(0.10)
     }
 }
 
@@ -6862,7 +6833,7 @@ private struct IslandSurfaceModePreviewScene: View {
         GeometryReader { proxy in
             ZStack {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color.islandForeground.opacity(0.035))
+                    .fill(Color.white.opacity(0.035))
 
                 switch surfaceMode {
                 case .notch:
@@ -6897,7 +6868,7 @@ private struct IslandSurfaceModePreviewScene: View {
                 Spacer()
                 Text(appLocalized: "顶部 Island")
                     .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.42))
+                    .foregroundColor(.white.opacity(0.42))
             }
             .padding(.horizontal, 10)
             .padding(.bottom, 8)
@@ -6913,7 +6884,7 @@ private struct IslandSurfaceModePreviewScene: View {
                 HStack {
                     Text(appLocalized: "右下角悬浮")
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color.islandForeground.opacity(0.46))
+                        .foregroundColor(.white.opacity(0.46))
                     Spacer()
                 }
                 Spacer()
@@ -6923,11 +6894,11 @@ private struct IslandSurfaceModePreviewScene: View {
             VStack(alignment: .trailing, spacing: 4) {
                 HStack(spacing: 8) {
                     RoundedRectangle(cornerRadius: 1.5, style: .continuous)
-                        .fill(Color.islandForeground.opacity(0.16))
+                        .fill(Color.white.opacity(0.16))
                         .frame(width: min(24, size.width * 0.10), height: 2)
 
                     RoundedRectangle(cornerRadius: 1.5, style: .continuous)
-                        .fill(Color.islandForeground.opacity(0.10))
+                        .fill(Color.white.opacity(0.10))
                         .frame(width: min(12, size.width * 0.05), height: 2)
                 }
 
@@ -6940,7 +6911,7 @@ private struct IslandSurfaceModePreviewScene: View {
 
                     Text("2")
                         .font(.system(size: numberSize, weight: .bold, design: .rounded))
-                        .foregroundColor(Color.islandForeground)
+                        .foregroundColor(Color(red: 1.0, green: 0.55, blue: 0.26))
                         .offset(y: -1)
                 }
             }
@@ -6993,11 +6964,11 @@ private struct FloatingPetPlacementInfoCard: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(appLocalized: "独立悬浮宠物")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(Color.islandForeground)
+                .foregroundColor(.white)
 
             Text(appLocalized: "独立悬浮宠物默认贴近当前激活窗口右下角显示。拖动后会记住新位置，右键宠物形象可重新打开设置面板。")
                 .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.58))
+                .foregroundColor(.white.opacity(0.58))
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.horizontal, 18)
@@ -7076,11 +7047,11 @@ private struct NotchDisplayModeSelector: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(appLocalized: "刘海显示模式")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(Color.islandForeground)
+                .foregroundColor(.white)
 
             Text(appLocalized: "直接预览刘海闭合态效果。简约模式只显示宠物和数量，详细模式会额外显示中间过程信息。")
                 .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.58))
+                .foregroundColor(.white.opacity(0.58))
                 .fixedSize(horizontal: false, vertical: true)
 
             HStack(spacing: 12) {
@@ -7126,11 +7097,11 @@ private struct NotchDisplayModeCard: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(appLocalized: mode.title)
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(Color.islandForeground)
+                            .foregroundColor(.white)
 
                         Text(appLocalized: mode.subtitle)
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(Color.islandForeground.opacity(0.62))
+                            .foregroundColor(.white.opacity(0.62))
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
@@ -7138,18 +7109,18 @@ private struct NotchDisplayModeCard: View {
 
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(isSelected ? accentColor : Color.islandForeground.opacity(0.26))
+                        .foregroundColor(isSelected ? accentColor : .white.opacity(0.26))
                 }
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Color.islandForeground.opacity(isSelected ? 0.09 : 0.035))
+                    .fill(Color.white.opacity(isSelected ? 0.09 : 0.035))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .strokeBorder(isSelected ? accentColor.opacity(0.56) : Color.islandForeground.opacity(0.08), lineWidth: 1)
+                    .strokeBorder(isSelected ? accentColor.opacity(0.56) : Color.white.opacity(0.08), lineWidth: 1)
             )
             .shadow(color: isSelected ? accentColor.opacity(0.18) : .clear, radius: 16, y: 8)
             .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -7190,7 +7161,7 @@ private struct NotchDisplayModeCard: View {
     }
 
     private var previewBorder: Color {
-        isSelected ? accentColor.opacity(0.42) : Color.islandForeground.opacity(0.10)
+        isSelected ? accentColor.opacity(0.42) : Color.white.opacity(0.10)
     }
 
     @ViewBuilder
@@ -7201,8 +7172,8 @@ private struct NotchDisplayModeCard: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                Color.islandForeground.opacity(0.08),
-                                Color.islandForeground.opacity(0.02)
+                                Color.white.opacity(0.08),
+                                Color.white.opacity(0.02)
                             ],
                             startPoint: .top,
                             endPoint: .bottom
@@ -7224,7 +7195,7 @@ private struct NotchDisplayModeCard: View {
                         Spacer()
                         Text(appLocalized: mode == .compact ? "简约示意" : "详细示意")
                             .font(.system(size: 10, weight: .semibold))
-                            .foregroundColor(Color.islandForeground.opacity(0.42))
+                            .foregroundColor(.white.opacity(0.42))
                     }
                     .padding(.horizontal, 10)
                     .padding(.bottom, 8)
@@ -7247,7 +7218,7 @@ private struct SettingsStatusLine: View {
                 HStack(alignment: .center, spacing: 16) {
                     Text(appLocalized: title)
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color.islandForeground)
+                        .foregroundColor(.white)
 
                     Spacer(minLength: 12)
 
@@ -7258,14 +7229,14 @@ private struct SettingsStatusLine: View {
 
                         Image(systemName: "arrow.up.right.square")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.islandForeground.opacity(0.5))
+                            .foregroundColor(.white.opacity(0.5))
                     }
                 }
 
                 if let subtitle {
                     Text(appLocalized: subtitle)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color.islandForeground.opacity(0.58))
+                        .foregroundColor(.white.opacity(0.58))
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -7316,7 +7287,7 @@ private struct SoundStartupLine: View {
 
                 Image(systemName: "music.note")
                     .font(.system(size: 22, weight: .semibold))
-                    .foregroundColor(Color.islandForeground.opacity(0.92))
+                    .foregroundColor(.white.opacity(0.92))
             }
             .frame(width: 52, height: 52)
             .shadow(color: Color(red: 0.96, green: 0.48, blue: 0.12).opacity(0.24), radius: 14, y: 7)
@@ -7344,13 +7315,13 @@ private struct SoundEventTextBlock: View {
         VStack(alignment: .leading, spacing: 5) {
             Text(appLocalized: title)
                 .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(Color.islandForeground.opacity(0.94))
+                .foregroundColor(.white.opacity(0.94))
                 .lineLimit(1)
                 .minimumScaleFactor(0.88)
 
             Text(appLocalized: subtitle)
                 .font(.system(size: 12, weight: .medium))
-                .foregroundColor(Color.islandForeground.opacity(0.58))
+                .foregroundColor(.white.opacity(0.58))
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -7367,15 +7338,15 @@ private struct SoundPreviewButton: View {
         Button(action: action) {
             Image(systemName: "play.fill")
                 .font(.system(size: size * 0.30, weight: .bold))
-                .foregroundColor(Color.islandForeground.opacity(isEnabled ? 0.86 : 0.32))
+                .foregroundColor(.white.opacity(isEnabled ? 0.86 : 0.32))
                 .offset(x: 1)
                 .frame(width: size, height: size)
                 .background(
                     Circle()
-                        .fill(Color.islandForeground.opacity(isEnabled ? 0.075 : 0.025))
+                        .fill(Color.white.opacity(isEnabled ? 0.075 : 0.025))
                         .overlay(
                             Circle()
-                                .strokeBorder(Color.islandForeground.opacity(isEnabled ? 0.13 : 0.05), lineWidth: 1)
+                                .strokeBorder(Color.white.opacity(isEnabled ? 0.13 : 0.05), lineWidth: 1)
                         )
                 )
         }
@@ -7452,7 +7423,7 @@ private struct SoundPackEventLine: View {
 
                 Text(categorySummary)
                     .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                    .foregroundColor(Color.islandForeground.opacity(0.38))
+                    .foregroundColor(.white.opacity(0.38))
                     .lineLimit(1)
                     .truncationMode(.middle)
             }

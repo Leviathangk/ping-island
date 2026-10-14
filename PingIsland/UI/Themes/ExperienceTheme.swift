@@ -44,6 +44,7 @@ struct ExperienceThemeVisualTokens {
     let sectionCornerRadius: CGFloat
     let controlFontDesign: Font.Design
     let customFontName: String?
+    let preferredColorScheme: ColorScheme?
     let settingsChromeStyle: ExperienceThemeSettingsChromeStyle
     let usesPixelGrid: Bool
     let usesGlassMaterial: Bool

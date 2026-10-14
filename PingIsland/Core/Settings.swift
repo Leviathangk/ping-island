@@ -414,7 +414,6 @@ final class AppSettingsStore: ObservableObject {
         static let island8BitResourceLimitSound = "island8BitResourceLimitSound"
         static let soundThemeMode = "soundThemeMode"
         static let experienceThemeID = "experienceThemeID"
-        static let appearanceMode = "appearanceMode"
         static let pixelThemePaletteID = "pixelThemePaletteID"
         static let island8BitStartSoundMigrated = "island8BitStartSoundMigrated"
         static let selectedSoundPackPath = "selectedSoundPackPath"
@@ -660,13 +659,6 @@ final class AppSettingsStore: ObservableObject {
         didSet {
             guard !isBootstrapping else { return }
             defaults.set(experienceThemeID.rawValue, forKey: Keys.experienceThemeID)
-        }
-    }
-
-    @Published var appearanceMode: AppAppearanceMode {
-        didSet {
-            guard !isBootstrapping else { return }
-            defaults.set(appearanceMode.rawValue, forKey: Keys.appearanceMode)
         }
     }
 
@@ -1395,9 +1387,6 @@ final class AppSettingsStore: ObservableObject {
         let resolvedExperienceThemeID = ExperienceThemeID(
             rawValue: experienceThemeIDRaw ?? ""
         ) ?? .appDefault
-        let resolvedAppearanceMode = AppAppearanceMode(
-            rawValue: defaults.string(forKey: Keys.appearanceMode) ?? ""
-        ) ?? .system
         let pixelThemePaletteIDRaw = defaults.string(forKey: Keys.pixelThemePaletteID)
         let resolvedPixelThemePaletteID = PixelThemePaletteID(
             rawValue: pixelThemePaletteIDRaw ?? ""
@@ -1528,7 +1517,6 @@ final class AppSettingsStore: ObservableObject {
         ) ?? .completeDing)
         _soundThemeMode = Published(initialValue: resolvedSoundThemeMode)
         _experienceThemeID = Published(initialValue: resolvedExperienceThemeID)
-        _appearanceMode = Published(initialValue: resolvedAppearanceMode)
         _pixelThemePaletteID = Published(initialValue: resolvedPixelThemePaletteID)
         _selectedSoundPackPath = Published(initialValue: defaults.string(forKey: Keys.selectedSoundPackPath) ?? "")
         _hideInFullscreen = Published(initialValue: Self.boolValue(
@@ -1718,9 +1706,6 @@ final class AppSettingsStore: ObservableObject {
         if defaults.string(forKey: Keys.pixelThemePaletteID) == nil {
             defaults.set(resolvedPixelThemePaletteID.rawValue, forKey: Keys.pixelThemePaletteID)
         }
-        if AppAppearanceMode(rawValue: defaults.string(forKey: Keys.appearanceMode) ?? "") == nil {
-            defaults.set(resolvedAppearanceMode.rawValue, forKey: Keys.appearanceMode)
-        }
         if !persistedKeys.contains(Keys.floatingPetScale) {
             defaults.set(floatingPetScale, forKey: Keys.floatingPetScale)
         }
@@ -1811,11 +1796,6 @@ enum AppSettings {
     static var experienceThemeID: ExperienceThemeID {
         get { shared.experienceThemeID }
         set { shared.experienceThemeID = newValue }
-    }
-
-    static var appearanceMode: AppAppearanceMode {
-        get { shared.appearanceMode }
-        set { shared.appearanceMode = newValue }
     }
 
     static var pixelThemePaletteID: PixelThemePaletteID {

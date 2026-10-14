@@ -136,18 +136,12 @@ final class IslandNSTextField: NSTextField {
         true
     }
 
-    override func viewDidChangeEffectiveAppearance() {
-        super.viewDidChangeEffectiveAppearance()
-        configureTextAppearance()
-    }
-
     func configureTextAppearance() {
-        textColor = NSColor(Color.islandForeground)
-        let placeholder = placeholderString ?? placeholderAttributedString?.string ?? ""
+        textColor = .white
         placeholderAttributedString = NSAttributedString(
-            string: placeholder,
+            string: placeholderString ?? "",
             attributes: [
-                .foregroundColor: NSColor(Color.islandForeground).withAlphaComponent(0.38),
+                .foregroundColor: NSColor.white.withAlphaComponent(0.38),
                 .font: font ?? NSFont.systemFont(ofSize: 13),
             ]
         )
@@ -155,10 +149,7 @@ final class IslandNSTextField: NSTextField {
     }
 
     func configureEditorAppearance() {
-        if let editor = currentEditor() as? NSTextView {
-            editor.textColor = textColor
-            editor.insertionPointColor = .controlAccentColor
-        }
+        (currentEditor() as? NSTextView)?.insertionPointColor = .controlAccentColor
     }
 }
 
