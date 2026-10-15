@@ -1228,9 +1228,15 @@ actor CodexAppServerMonitor {
         }
     }
 
-    private func ingestThreadList(_ response: [String: Any]) async {
+    func ingestThreadList(_ response: [String: Any]) async {
         guard let data = response["data"] as? [[String: Any]] else { return }
         let visibleThreads = data.filter { !Self.shouldIgnoreAuxiliaryThread($0) }
+        let visibleThreadIds = Set(visibleThreads.compactMap { $0["id"] as? String })
+        for thread in data where Self.shouldIgnoreAuxiliaryThread(thread) {
+            guard let threadId = thread["id"] as? String,
+                  !visibleThreadIds.contains(threadId) else { continue }
+            await ingestThread(thread)
+        }
         let candidateCounts = Dictionary(
             grouping: visibleThreads.compactMap { thread -> (String, [String: Any])? in
                 guard let threadId = (thread["id"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -1343,6 +1349,7 @@ actor CodexAppServerMonitor {
         guard let threadId = thread["id"] as? String else { return }
         if Self.shouldIgnoreAuxiliaryThread(thread) {
             logger.notice("Ignoring auxiliary Codex thread=\(threadId, privacy: .public)")
+            await SessionStore.shared.removeCodexAuxiliarySession(sessionId: threadId)
             await clearRolloutRecoveryState(threadId: threadId)
             recoveredNotLoadedThreadVersions.removeValue(forKey: threadId)
             removeThreadDiagnostics(threadId: threadId)

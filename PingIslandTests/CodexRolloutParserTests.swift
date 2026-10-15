@@ -63,6 +63,7 @@ final class CodexRolloutParserTests: XCTestCase {
             ("thread_title", "An inherited user request", true),
             ("thread_title_reconsideration", "An inherited user request", true),
             ("ambient_suggestions", "An inherited user request", true),
+            ("composer_predictions", "An inherited user request", true),
             (nil, titlePrompt, true),
             ("user", "Review this template: " + titlePrompt, false),
             ("ambient_suggestion_task", "Return project suggestions as JSON", false),

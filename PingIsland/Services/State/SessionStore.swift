@@ -39,6 +39,9 @@ actor SessionStore {
         let codexSubagentLevel: Int?
         let codexSubagentLabel: String?
         let hasIntervention: Bool
+        let needsPromptNotification: Bool
+        let suppressInAppPromptControls: Bool
+        let threadSource: String?
         let chatItemCount: Int
         let lastActivity: Date
         let createdAt: Date
@@ -738,9 +741,21 @@ actor SessionStore {
             clearCurrentIntervention(in: &session, nextPhase: session.phase)
         }
 
-        if event.suppressInAppPrompt {
+        if event.isTerminalRoutedPromptRequest {
+            if !session.needsApprovalResponse, event.bridgeIntervention?.kind != .approval {
+                // Native questions do not always arrive with a waiting status
+                // once the bridge has handed their answer channel to the client.
+                session.phase = .waitingForInput
+            }
             session.suppressInAppPromptControls =
                 session.needsApprovalResponse || session.phase == .waitingForInput || session.intervention != nil
+        } else if event.suppressInAppPrompt,
+                  event.event == "Notification",
+                  session.suppressInAppPromptControls,
+                  phaseBeforeHook == .waitingForInput {
+            // Idle reminders preserve a real unanswered native prompt, but the
+            // routing policy alone must never create one for a completed turn.
+            session.phase = .waitingForInput
         } else if !session.needsApprovalResponse, case .none = session.intervention {
             session.suppressInAppPromptControls = false
         } else if event.expectsResponse || hasIncomingIntervention {
@@ -3775,6 +3790,9 @@ actor SessionStore {
                     codexSubagentLevel: session.codexSubagentLevel,
                     codexSubagentLabel: session.codexSubagentLabel,
                     hasIntervention: session.intervention != nil,
+                    needsPromptNotification: session.needsPromptNotification,
+                    suppressInAppPromptControls: session.suppressInAppPromptControls,
+                    threadSource: session.clientInfo.threadSource,
                     chatItemCount: session.chatItems.count,
                     lastActivity: session.lastActivity,
                     createdAt: session.createdAt,
@@ -3809,7 +3827,7 @@ actor SessionStore {
                     "thread_source": clientInfo?.threadSource ?? ""
                 ]
            ) {
-            removeCodexAuxiliarySession(sessionId: preliminarySessionId)
+            removeCodexAuxiliarySession(sessionId: sessionId)
             return
         }
 
@@ -4020,7 +4038,7 @@ actor SessionStore {
                     "thread_source": snapshot.clientInfo?.threadSource ?? ""
                 ]
            ) {
-            removeCodexAuxiliarySession(sessionId: resolveCodexSessionAlias(snapshot.threadId))
+            removeCodexAuxiliarySession(sessionId: snapshot.threadId)
             return
         }
 
@@ -4211,13 +4229,18 @@ actor SessionStore {
         }
     }
 
-    private func removeCodexAuxiliarySession(sessionId: String) {
+    /// Helpers may be identified after an ordinary-looking hook or thread row.
+    /// Remove only their own row: a stale alias can point at a real user task.
+    /// Keep any unanswered prompt even when later metadata identifies a helper.
+    func removeCodexAuxiliarySession(sessionId: String) {
         let resolvedSessionId = resolveCodexSessionAlias(sessionId)
-        let existed = sessions.removeValue(forKey: resolvedSessionId) != nil
-        clearCodexSessionAliases(for: resolvedSessionId)
-        cancelPendingSync(sessionId: resolvedSessionId)
-        cancelPendingCodexPlaceholderPrune(sessionId: resolvedSessionId)
-        lastCodexRolloutParseAt.removeValue(forKey: resolvedSessionId)
+        guard sessions[sessionId]?.needsPromptNotification != true,
+              sessions[resolvedSessionId]?.needsPromptNotification != true else { return }
+        let existed = sessions.removeValue(forKey: sessionId) != nil
+        clearCodexSessionAliases(for: sessionId)
+        cancelPendingSync(sessionId: sessionId)
+        cancelPendingCodexPlaceholderPrune(sessionId: sessionId)
+        lastCodexRolloutParseAt.removeValue(forKey: sessionId)
         if existed {
             publishState()
         }

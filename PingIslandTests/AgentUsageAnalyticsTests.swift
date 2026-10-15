@@ -401,7 +401,8 @@ final class AgentUsageAnalyticsTests: XCTestCase {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         let store = AgentUsageStore(fileURL: fileURL, calendar: calendar)
-        let capturedAt = Date(timeIntervalSince1970: 1_775_520_000)
+        // Recording prunes against the current clock, so keep the fixture within retention.
+        let capturedAt = Date()
         let sourcePath = "/tmp/.codex/sessions/2026/04/10/rollout-2026-04-10T00-00-00-019db9a7-336a-7b62-9288-7304c3d2d4b9.jsonl"
 
         await store.recordCodexUsageSnapshot(CodexUsageSnapshot(

@@ -299,6 +299,29 @@ extension HookEvent {
             && !(questionPayloads?.isEmpty ?? true)
     }
 
+    /// Terminal routing is a policy carried on state-only hooks as well. Only
+    /// concrete prompts create attention; ordinary completion is not a prompt.
+    nonisolated var isTerminalRoutedPromptRequest: Bool {
+        guard suppressInAppPrompt, event != "Stop", event != "SessionEnd" else { return false }
+        if sessionPhase.isWaitingForApproval || bridgeIntervention != nil {
+            return true
+        }
+        if event == "UserInputRequest", sessionPhase == .waitingForInput {
+            return true
+        }
+        if event == "Notification", notificationType == "permission_prompt",
+           clientInfo.isCodeBuddyCLIClient, isCodeBuddyCLIAskUserQuestionNotification {
+            return true
+        }
+        // This describes the native question even when Island does not own its
+        // answer channel (notably Claude PreToolUse with terminal routing).
+        return (event == "PreToolUse" || event == "PermissionRequest")
+            && (Self.questionToolNames.contains(normalizedToolNameForIntervention ?? "")
+                || isOmpQuestionToolEvent)
+            && !(questionPayloads?.isEmpty ?? true)
+            && !isAnsweredAskUserQuestionEvent
+    }
+
     private nonisolated var isCodeBuddyCLIClient: Bool {
         clientInfo.isCodeBuddyCLIClient
     }

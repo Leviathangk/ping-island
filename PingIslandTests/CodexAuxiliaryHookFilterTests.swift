@@ -6,7 +6,7 @@ final class CodexAuxiliaryHookFilterTests: XCTestCase {
     func testAuxiliarySourcesAreExactAndDoNotHideUserCreatedSuggestionTasks() {
         for source in [
             "thread_title", "thread_description", "thread_summary", "thread_title_reconsideration",
-            "ambient_suggestions", "ambient_suggestion_safety"
+            "ambient_suggestions", "ambient_suggestion_safety", "composer_predictions"
         ] {
             XCTAssertTrue(CodexAuxiliaryHookFilter.isCodexAuxiliaryThread(
                 cwd: "/tmp/project", title: "project", preview: #"{"title":"Project title"}"#,
@@ -15,7 +15,7 @@ final class CodexAuxiliaryHookFilterTests: XCTestCase {
         }
 
         for source in ["user", "ambient_suggestion_task", "subagent", "title", "cli", "vscode"] {
-            for response in [#"{"title":"Project title"}"#, #"{"suggestions":[]}"#, #"{"exclude":[]}"#] {
+            for response in [#"{"title":"Project title"}"#, #"{"suggestions":[]}"#, #"{"suggestion":"Continue the task"}"#, #"{"exclude":[]}"#] {
                 XCTAssertFalse(CodexAuxiliaryHookFilter.isCodexAuxiliaryThread(
                     cwd: "/tmp/project", title: "project", preview: response,
                     metadata: ["thread_source": source]
@@ -69,6 +69,59 @@ final class CodexAuxiliaryHookFilterTests: XCTestCase {
             title: nil, preview: #"{"suggestions":[]}"#, metadata: [:]))
         XCTAssertFalse(filter.shouldIgnore(provider: .claude, sessionId: "user", eventType: "UserPromptSubmit",
             title: nil, preview: prompt, metadata: [:]))
+    }
+
+    func testComposerPredictionPromptIsRecognizedWithoutMatchingQuotedOrUserRequests() {
+        let prompt = """
+        This is an app-generated request for a suggested next user message. The user did not write this message.
+        Your suggestion will appear in the user's empty message composer. They can accept it, edit it, or ignore it; it will not be sent automatically.
+        Predict the single message this user is most likely to type next from the visible conversation. Use the whole conversation to understand their current intent and the latest exchange.
+        """
+
+        XCTAssertTrue(CodexAuxiliaryHookFilter.isCodexSuggestionGenerationPrompt(prompt))
+        XCTAssertTrue(CodexAuxiliaryHookFilter.isCodexSuggestionGenerationPrompt("\n  " + prompt.uppercased()))
+        XCTAssertTrue(CodexAuxiliaryHookFilter.isCodexAuxiliaryThread(
+            cwd: nil, title: nil, preview: prompt
+        ))
+        XCTAssertTrue(CodexAuxiliaryHookFilter.isCodexAuxiliaryThread(
+            cwd: "/tmp/composer-prediction-project", title: "project",
+            preview: #"{"suggestion":"Continue the task"}"#, metadata: ["prompt": prompt]
+        ))
+
+        for userRequest in [
+            "Please review this prompt: " + prompt,
+            "> " + prompt,
+            "This is an app-generated request for a suggested next user message.",
+            "Predict the single message this user is most likely to type next from the visible conversation.",
+            prompt.replacingOccurrences(of: "The user did not write this message.", with: "The user wrote this message."),
+            #"{"suggestion":"Continue the task"}"#
+        ] {
+            XCTAssertFalse(CodexAuxiliaryHookFilter.isCodexSuggestionGenerationPrompt(userRequest), userRequest)
+        }
+        XCTAssertFalse(CodexAuxiliaryHookFilter.isCodexAuxiliaryThread(
+            cwd: nil, title: nil, preview: prompt,
+            metadata: ["prompt": "Explain how the app predicts the next message"]
+        ))
+    }
+
+    func testComposerPredictionFollowupHooksAreIgnoredWithoutSourceOrPathMetadata() {
+        let prompt = "This is an app-generated request for a suggested next user message. The user did not write this message. Your suggestion will appear in the user's empty message composer. They can accept it, edit it, or ignore it; it will not be sent automatically. Predict the single message this user is most likely to type next from the visible conversation. Use the whole conversation to understand their current intent and the latest exchange."
+        var filter = CodexAuxiliaryHookFilter()
+
+        XCTAssertTrue(filter.shouldIgnore(
+            provider: .codex, sessionId: "composer-prediction-helper", eventType: "UserPromptSubmit",
+            title: nil, preview: prompt, metadata: [:]
+        ))
+        for event in ["PreToolUse", "PostToolUse", "Stop"] {
+            XCTAssertTrue(filter.shouldIgnore(
+                provider: .codex, sessionId: "composer-prediction-helper", eventType: event,
+                title: nil, preview: #"{"suggestion":"Continue the task"}"#, metadata: [:]
+            ), event)
+        }
+        XCTAssertFalse(filter.shouldIgnore(
+            provider: .claude, sessionId: "composer-prediction-other-provider", eventType: "UserPromptSubmit",
+            title: nil, preview: prompt, metadata: [:]
+        ))
     }
 
     func testIgnoresCodexTitleGenerationPrompt() {

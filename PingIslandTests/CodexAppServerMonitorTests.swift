@@ -228,6 +228,102 @@ final class CodexAppServerMonitorTests: XCTestCase {
         XCTAssertEqual(helper.threadSource, "thread_title")
     }
 
+    func testComposerPredictionSnapshotsAreFilteredWithoutHidingUserSuggestions() {
+        let monitor = CodexAppServerMonitor.shared
+        for sourceKey in ["threadSource", "thread_source"] {
+            for source in ["composer_predictions", "ambient_suggestion_task", "user"] {
+                let snapshot = monitor.parseThreadSnapshot([
+                    "id": "prediction-snapshot", "cwd": "/tmp/project",
+                    "source": "vscode", sourceKey: source,
+                    "preview": #"{"suggestion":"Continue the task"}"#,
+                    "status": ["type": "idle"],
+                    "turns": [["id": "turn", "items": [[
+                        "id": "user", "type": "userMessage",
+                        "content": [["type": "text", "text": "An inherited user request"]]
+                    ]]]]
+                ])
+                XCTAssertEqual(snapshot == nil, source == "composer_predictions", "\(sourceKey): \(source)")
+            }
+        }
+    }
+
+    func testComposerPredictionDiscoveryRemovesOldRowAndIgnoresFollowupNotifications() async throws {
+        let monitor = CodexAppServerMonitor()
+        let store = SessionStore.shared
+        let id = "prediction-discovery-\(UUID().uuidString)"
+        await store.upsertCodexSession(
+            sessionId: id, name: "project", preview: #"{"suggestion":"Continue the task"}"#,
+            cwd: "/tmp/project", phase: .idle, intervention: nil
+        )
+        let initial = await store.session(for: id)
+        XCTAssertNotNil(initial)
+        try await deliver(["method": "thread/started", "params": ["thread": [
+            "id": id, "cwd": "/tmp/project", "threadSource": "composer_predictions",
+            "ephemeral": true, "status": ["type": "active"]
+        ]]], to: monitor)
+        for method in ["thread/status/changed", "turn/started", "item/started", "item/completed", "turn/completed"] {
+            try await deliver(["method": method, "params": [
+                "threadId": id, "status": ["type": "idle"]
+            ]], to: monitor)
+        }
+        let remaining = await store.session(for: id)
+        XCTAssertNil(remaining)
+        await monitor.stop()
+        await store.process(.sessionArchived(sessionId: id))
+    }
+
+    func testHelperDiscoveryPreservesPendingApprovalsAndQuestions() async throws {
+        for method in ["item/commandExecution/requestApproval", "item/tool/requestUserInput"] {
+            let monitor = CodexAppServerMonitor()
+            let store = SessionStore.shared
+            let id = "prediction-intervention-\(UUID().uuidString)"
+            try await deliver([
+                "id": "request", "method": method, "params": [
+                    "threadId": id, "command": ["printf", "test"],
+                    "questions": [["id": "q1", "header": "Choice", "question": "Continue?", "options": []]]
+                ]
+            ], to: monitor)
+            try await deliver(["method": "thread/started", "params": ["thread": [
+                "id": id, "cwd": "/tmp/project", "threadSource": "composer_predictions",
+                "ephemeral": true, "status": ["type": "active"]
+            ]]], to: monitor)
+            let remaining = await store.session(for: id)
+            XCTAssertEqual(remaining?.intervention?.id, "request", method)
+            XCTAssertTrue(remaining?.needsPromptNotification == true, method)
+            await monitor.stop()
+            await store.process(.sessionArchived(sessionId: id))
+        }
+    }
+
+    func testHelperListCleanupPreservesAnAcceptedDuplicateCandidate() async {
+        let monitor = CodexAppServerMonitor()
+        let store = SessionStore.shared
+        let id = "prediction-duplicate-\(UUID().uuidString)"
+        let createdAt = Date().addingTimeInterval(-3600)
+        await store.upsertCodexSession(
+            sessionId: id, name: "Real task", preview: "Real user work", cwd: "/tmp/project",
+            phase: .idle, intervention: nil, createdAt: createdAt
+        )
+        let helper: [String: Any] = [
+            "id": id, "cwd": "/tmp/project", "threadSource": "composer_predictions",
+            "ephemeral": true, "status": ["type": "idle"]
+        ]
+        let normal: [String: Any] = [
+            "id": id, "cwd": "/tmp/project", "threadSource": "user",
+            "name": "Real task", "preview": "Real user work", "status": ["type": "idle"]
+        ]
+        await monitor.ingestThreadList(["data": [helper, normal]])
+        let preserved = await store.session(for: id)
+        XCTAssertEqual(preserved?.createdAt, createdAt)
+        XCTAssertEqual(preserved?.sessionName, "Real task")
+
+        await monitor.ingestThreadList(["data": [helper]])
+        let removed = await store.session(for: id)
+        XCTAssertNil(removed)
+        await monitor.stop()
+        await store.process(.sessionArchived(sessionId: id))
+    }
+
     private func makeTemporaryApplication(
         bundleIdentifier: String,
         name: String = "TestHost.app"

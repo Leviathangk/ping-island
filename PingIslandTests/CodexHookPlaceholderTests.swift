@@ -101,6 +101,122 @@ final class CodexHookPlaceholderTests: XCTestCase {
         }
     }
 
+    func testComposerPredictionSourceFiltersHooksAndAppServerSummaries() async {
+        let store = SessionStore.shared
+        let sessionId = "composer-prediction-\(UUID().uuidString)"
+        let preview = #"{"suggestion":"Continue the task"}"#
+        await store.process(.hookReceived(makeCodexEvent(
+            sessionId: sessionId, event: "UserPromptSubmit", status: "processing",
+            message: "An inherited user request", threadSource: "composer_predictions"
+        )))
+        await store.process(.hookReceived(makeCodexEvent(
+            sessionId: sessionId, event: "Stop", status: "waiting_for_input", message: preview
+        )))
+        let hooked = await store.session(for: sessionId)
+        XCTAssertNil(hooked)
+
+        var client = SessionClientInfo.codexApp(threadId: sessionId)
+        client.threadSource = "composer_predictions"
+        await store.upsertCodexSession(
+            sessionId: sessionId, name: "project", preview: preview, cwd: "/tmp/project",
+            phase: .idle, intervention: nil, clientInfo: client
+        )
+        let summarized = await store.session(for: sessionId)
+        XCTAssertNil(summarized)
+        await store.process(.sessionArchived(sessionId: sessionId))
+    }
+
+    func testComposerPredictionOpeningRemovesPlaceholderWithoutSourceOrRolloutPath() async {
+        let store = SessionStore.shared
+        let sessionId = "composer-opening-\(UUID().uuidString)"
+        let cwd = "/tmp/composer-opening-\(UUID().uuidString)"
+        await store.process(.hookReceived(makeCodexEvent(
+            sessionId: sessionId, event: "SessionStart", status: "waiting_for_input", cwd: cwd
+        )))
+        let placeholder = await store.session(for: sessionId)
+        XCTAssertNotNil(placeholder)
+
+        let prompt = "This is an app-generated request for a suggested next user message. The user did not write this message. Your suggestion will appear in the user's empty message composer. They can accept it, edit it, or ignore it; it will not be sent automatically. Predict the single message this user is most likely to type next from the visible conversation. Use the whole conversation to understand their current intent and the latest exchange."
+        await store.process(.hookReceived(makeCodexEvent(
+            sessionId: sessionId, event: "UserPromptSubmit", status: "processing", message: prompt, cwd: cwd
+        )))
+        let filtered = await store.session(for: sessionId)
+        XCTAssertNil(filtered)
+
+        for event in ["PreToolUse", "PostToolUse", "Stop"] {
+            await store.process(.hookReceived(makeCodexEvent(
+                sessionId: sessionId, event: event,
+                status: event == "Stop" ? "waiting_for_input" : "processing",
+                message: event == "Stop" ? #"{"suggestion":"Continue the task"}"# : "Read project files",
+                cwd: cwd
+            )))
+            let session = await store.session(for: sessionId)
+            XCTAssertNil(session, event)
+        }
+        await store.process(.sessionArchived(sessionId: sessionId))
+    }
+
+    func testNormalSingularSuggestionJSONRemainsVisibleWithoutSourceOrRolloutPath() async {
+        let store = SessionStore.shared
+        let sessionId = "user-suggestion-json-\(UUID().uuidString)"
+        let cwd = "/tmp/user-suggestion-json-\(UUID().uuidString)"
+        await store.process(.hookReceived(makeCodexEvent(
+            sessionId: sessionId, event: "UserPromptSubmit", status: "processing",
+            message: "Return a JSON suggestion for the next project task", cwd: cwd
+        )))
+        await store.process(.hookReceived(makeCodexEvent(
+            sessionId: sessionId, event: "Stop", status: "waiting_for_input",
+            message: #"{"suggestion":"Continue the task"}"#, cwd: cwd
+        )))
+        let session = await store.session(for: sessionId)
+        XCTAssertNotNil(session)
+        XCTAssertFalse(session?.shouldHideFromPrimaryUI ?? true)
+        await store.process(.sessionArchived(sessionId: sessionId))
+    }
+
+    func testAuxiliaryCleanupSeversTransientHookAliasWithoutRemovingRealTask() async {
+        let store = SessionStore.shared
+        let realId = "real-task-\(UUID().uuidString)"
+        let helperId = "prediction-alias-\(UUID().uuidString)"
+        let cwd = "/tmp/prediction-alias-\(UUID().uuidString)"
+        await store.upsertCodexSession(
+            sessionId: realId, name: "Real task", preview: "Real user work",
+            cwd: cwd, phase: .idle, intervention: nil
+        )
+        await store.process(.hookReceived(makeCodexEvent(
+            sessionId: helperId, event: "UserPromptSubmit", status: "processing", cwd: cwd
+        )))
+        let aliased = await store.resolvedCodexSessionId(for: helperId)
+        XCTAssertEqual(aliased, realId)
+
+        await store.removeCodexAuxiliarySession(sessionId: helperId)
+        let realTask = await store.session(for: realId)
+        let helper = await store.session(for: helperId)
+        XCTAssertEqual(realTask?.sessionName, "Real task")
+        XCTAssertNil(helper)
+
+        // A pending request addressed through the alias still needs that route
+        // when the client later resolves it.
+        await store.process(.hookReceived(makeCodexEvent(
+            sessionId: helperId, event: "UserPromptSubmit", status: "processing", cwd: cwd
+        )))
+        await store.upsertCodexSession(
+            sessionId: helperId, name: nil, preview: "Continue?", cwd: cwd,
+            phase: .waitingForInput, intervention: SessionIntervention(
+                id: "request", kind: .question, title: "Choice", message: "Continue?",
+                options: [], questions: [], supportsSessionScope: false, metadata: [:]
+            )
+        )
+        await store.removeCodexAuxiliarySession(sessionId: helperId)
+        let pendingAlias = await store.resolvedCodexSessionId(for: helperId)
+        XCTAssertEqual(pendingAlias, realId)
+        await store.resolveCodexIntervention(sessionId: helperId, nextPhase: .processing, requestId: "request")
+        let resolvedTask = await store.session(for: realId)
+        XCTAssertNotNil(resolvedTask)
+        XCTAssertNil(resolvedTask?.intervention)
+        await store.process(.sessionArchived(sessionId: realId))
+    }
+
     func testCodexMemoryMaintenanceHookIsIgnored() async {
         let sessionId = "codex-memory-\(UUID().uuidString)"
         let store = SessionStore.shared

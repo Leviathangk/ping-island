@@ -2,6 +2,140 @@ import XCTest
 @testable import Ping_Island
 
 final class SessionStoreCodexInterventionTests: XCTestCase {
+    func testTerminalRoutingPolicyDoesNotTurnOrdinaryStopIntoPrompt() async throws {
+        let store = SessionStore.shared
+        for provider in [SessionProvider.codex, .claude] {
+            let sessionId = "routing-policy-stop-\(UUID().uuidString)"
+            await store.process(.hookReceived(makeRoutedStateEvent(
+                sessionId: sessionId, event: "UserPromptSubmit", status: "processing", provider: provider
+            )))
+            await store.process(.hookReceived(makeRoutedStateEvent(
+                sessionId: sessionId, event: "Stop", status: "waiting_for_input", provider: provider
+            )))
+            let stored = await store.session(for: sessionId)
+            var session = try XCTUnwrap(stored)
+            XCTAssertEqual(session.phase, .waitingForInput)
+            XCTAssertFalse(session.suppressInAppPromptControls)
+            XCTAssertFalse(session.needsPromptNotification)
+            XCTAssertNil(IslandExpandedRouteResolver.highestPriorityAttentionSession(from: [session]))
+            session.lastActivity = Date().addingTimeInterval(-31 * 60)
+            XCTAssertTrue(session.shouldAutoArchiveFromPrimaryUI)
+            await store.process(.sessionArchived(sessionId: sessionId))
+        }
+    }
+
+    func testTerminalRoutingPolicyDoesNotCreatePromptFromIdleNotification() async throws {
+        let store = SessionStore.shared
+        let sessionId = "routing-policy-idle-\(UUID().uuidString)"
+        await store.process(.hookReceived(makeRoutedStateEvent(
+            sessionId: sessionId, event: "Notification", status: "waiting_for_input"
+        )))
+        let stored = await store.session(for: sessionId)
+        let session = try XCTUnwrap(stored)
+        XCTAssertFalse(session.suppressInAppPromptControls)
+        XCTAssertFalse(session.needsPromptNotification)
+        await store.process(.sessionArchived(sessionId: sessionId))
+    }
+
+    func testTerminalPromptSurvivesIdleNotificationAndClearsOnStopWithRoutingPolicy() async throws {
+        let store = SessionStore.shared
+        let sessionId = "routing-policy-question-\(UUID().uuidString)"
+        _ = try await seedTerminalRoutedPrompt(sessionId: sessionId)
+        await store.process(.hookReceived(makeRoutedStateEvent(
+            sessionId: sessionId, event: "Notification", status: "waiting_for_input"
+        )))
+        let pending = await store.session(for: sessionId)
+        XCTAssertTrue(pending?.needsPromptNotification == true)
+
+        await store.process(.hookReceived(makeRoutedStateEvent(
+            sessionId: sessionId, event: "Stop", status: "waiting_for_input"
+        )))
+        let stored = await store.session(for: sessionId)
+        let completed = try XCTUnwrap(stored)
+        assertTerminalPromptCleared(completed)
+        await store.process(.sessionArchived(sessionId: sessionId))
+    }
+
+    func testSuppressedClaudePreToolQuestionStillNotifiesWithoutIslandAnswerChannel() async throws {
+        let store = SessionStore.shared
+        let sessionId = "claude-terminal-question-\(UUID().uuidString)"
+        let input = String(decoding: try JSONSerialization.data(withJSONObject: [
+            "questions": [["question": "Continue?", "options": [["label": "Yes"]]]]
+        ]), as: UTF8.self)
+        // The managed Claude bridge has no client-kind argument and drops the
+        // Island intervention during terminal routing, leaving runningTool here.
+        let event = try decodeTerminalRoutedEnvelope(
+            sessionId: sessionId, eventType: "PreToolUse", status: "runningTool",
+            metadata: ["tool_name": "AskUserQuestion", "tool_input_json": input]
+        )
+        XCTAssertFalse(event.expectsResponse)
+        XCTAssertFalse(event.isAskUserQuestionRequest)
+        await store.process(.hookReceived(event))
+        let stored = await store.session(for: sessionId)
+        let prompt = try XCTUnwrap(stored)
+        XCTAssertEqual(prompt.phase, .waitingForInput)
+        XCTAssertTrue(prompt.needsPromptNotification)
+        XCTAssertNil(prompt.intervention)
+        let diagnostic = await store.diagnosticsSnapshot().first { $0.sessionId == sessionId }
+        XCTAssertEqual(diagnostic?.needsPromptNotification, true)
+        XCTAssertEqual(diagnostic?.suppressInAppPromptControls, true)
+        await store.process(.sessionArchived(sessionId: sessionId))
+    }
+
+    func testTerminalRoutingPreservesDedicatedUserInputAndCodeBuddyQuestionEvents() async throws {
+        let store = SessionStore.shared
+        let cases: [(String, [String: String])] = [
+            ("UserInputRequest", ["message": "Continue?"]),
+            ("Notification", [
+                "client_kind": "codebuddy-cli", "notification_type": "permission_prompt",
+                "message": "CodeBuddy Code needs your permission to use AskUserQuestion"
+            ])
+        ]
+        for (eventType, metadata) in cases {
+            let id = "terminal-native-question-\(UUID().uuidString)"
+            let event = try decodeTerminalRoutedEnvelope(
+                sessionId: id, eventType: eventType, status: "waitingForInput", metadata: metadata
+            )
+            XCTAssertTrue(event.isTerminalRoutedPromptRequest, eventType)
+            await store.process(.hookReceived(event))
+            let pending = await store.session(for: id)
+            XCTAssertEqual(pending?.phase, .waitingForInput, eventType)
+            XCTAssertTrue(pending?.needsPromptNotification == true, eventType)
+            XCTAssertNil(pending?.intervention, eventType)
+            await store.process(.sessionArchived(sessionId: id))
+        }
+    }
+
+    private func decodeTerminalRoutedEnvelope(
+        sessionId: String, eventType: String, status: String, metadata: [String: String]
+    ) throws -> HookEvent {
+        let envelope: [String: Any] = [
+            "id": UUID().uuidString, "provider": "claude", "eventType": eventType,
+            "sessionKey": "claude:\(sessionId)", "cwd": "/tmp/\(sessionId)",
+            "terminalContext": [:], "expectsResponse": false, "status": ["kind": status],
+            "metadata": metadata.merging(["suppress_in_app_prompt": "true"]) { _, new in new }
+        ]
+        return try HookSocketServer.decodeHookEvent(from: JSONSerialization.data(withJSONObject: envelope))
+    }
+
+    private func makeRoutedStateEvent(
+        sessionId: String,
+        event: String,
+        status: String,
+        provider: SessionProvider = .codex
+    ) -> HookEvent {
+        HookEvent(
+            sessionId: sessionId, cwd: "/tmp/\(sessionId)", event: event, status: status,
+            provider: provider,
+            clientInfo: provider == .codex ? .codexApp(threadId: sessionId)
+                : SessionClientInfo(kind: .claudeCode, name: "Claude Code"),
+            pid: nil, tty: nil, tool: nil, toolInput: nil, toolUseId: nil,
+            notificationType: event == "Notification" ? "idle_prompt" : nil,
+            message: event == "Stop" ? "Done" : "Waiting for input",
+            suppressInAppPrompt: true
+        )
+    }
+
     func testFreshCodexSnapshotClearsTerminalPromptFlagAfterWaitingEnds() async throws {
         let store = SessionStore.shared
         for phase in [SessionPhase.idle, .processing] {
@@ -172,15 +306,16 @@ final class SessionStoreCodexInterventionTests: XCTestCase {
         await store.process(.sessionArchived(sessionId: sessionId))
     }
 
-    private func seedTerminalRoutedPrompt(sessionId: String) async throws -> SessionState {
+    private func seedTerminalRoutedPrompt(sessionId: String, provider: SessionProvider = .codex) async throws -> SessionState {
         let store = SessionStore.shared
         await store.process(.hookReceived(HookEvent(
             sessionId: sessionId,
             cwd: "/tmp/\(sessionId)",
             event: "PreToolUse",
             status: "waiting_for_input",
-            provider: .codex,
-            clientInfo: SessionClientInfo.codexApp(threadId: sessionId),
+            provider: provider,
+            clientInfo: provider == .codex ? .codexApp(threadId: sessionId)
+                : SessionClientInfo(kind: .claudeCode, name: "Claude Code"),
             pid: nil,
             tty: nil,
             tool: "AskUserQuestion",

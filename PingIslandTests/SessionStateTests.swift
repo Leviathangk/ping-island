@@ -837,6 +837,9 @@ final class SessionStateTests: XCTestCase {
         session.chatItems = [ChatHistoryItem(id: "user", type: .user("An inherited user task"), timestamp: Date())]
         session.clientInfo.threadSource = "thread_title_reconsideration"
         XCTAssertTrue(session.shouldHideFromPrimaryUI)
+        session.clientInfo.threadSource = "composer_predictions"
+        session.previewText = #"{"suggestion":"Continue the task"}"#
+        XCTAssertTrue(session.shouldHideFromPrimaryUI)
         session.clientInfo.threadSource = "ambient_suggestion_task"
         XCTAssertFalse(session.shouldHideFromPrimaryUI)
 

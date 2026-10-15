@@ -267,7 +267,7 @@ struct HookEvent: Sendable {
         bridgeExpectsResponse == false || isQoderWorkNotifyOnlyPermissionRequest
     }
 
-    private nonisolated var isCodeBuddyCLIAskUserQuestionNotification: Bool {
+    nonisolated var isCodeBuddyCLIAskUserQuestionNotification: Bool {
         let normalizedMessage = message?
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased()
@@ -1273,7 +1273,8 @@ struct CodexAuxiliaryHookFilter {
         "thread_summary",
         "thread_title_reconsideration",
         "ambient_suggestions",
-        "ambient_suggestion_safety"
+        "ambient_suggestion_safety",
+        "composer_predictions"
     ]
     private nonisolated static let titleGenerationPromptPrefix =
         "you are a helpful assistant. you will be presented with a user prompt"
@@ -1353,13 +1354,21 @@ struct CodexAuxiliaryHookFilter {
             && hasDisplayOrReturnInstruction
     }
 
-    /// Desktop ambient suggestion runs use the project cwd and can execute tools.
+    /// Desktop suggestion runs use the project cwd and can execute tools.
     /// Match their dedicated opening prompt, never arbitrary mentions or result JSON.
     nonisolated static func isCodexSuggestionGenerationPrompt(_ text: String?) -> Bool {
         guard let prompt = normalizedPrompt(text) else { return false }
         let prefix = "# overview generate 0 to 3 hyperpersonalized suggestions for what this user can do with codex in "
-        return prompt.hasPrefix(prefix + "this local project:")
-            || prompt.hasPrefix(prefix + "this projectless task")
+        if prompt.hasPrefix(prefix + "this local project:")
+            || prompt.hasPrefix(prefix + "this projectless task") {
+            return true
+        }
+
+        // Composer prediction hooks may omit both their source and rollout path.
+        return prompt.hasPrefix("this is an app-generated request for a suggested next user message.")
+            && prompt.contains("the user did not write this message.")
+            && prompt.contains("your suggestion will appear in the user's empty message composer.")
+            && prompt.contains("predict the single message this user is most likely to type next from the visible conversation.")
     }
 
     nonisolated static func isCodexAuxiliaryThread(
